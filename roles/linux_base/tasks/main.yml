@@ -46,6 +46,9 @@
   copy:
     content: "Europe/Zurich\n"
     dest: /etc/timezone
+    owner: root
+    group: root
+    mode: "0644"
 
 - name: Reconfigure tzdata
   command: dpkg-reconfigure -f noninteractive tzdata
