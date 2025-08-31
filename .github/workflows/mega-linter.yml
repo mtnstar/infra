@@ -15,6 +15,8 @@ on:
       - main
       - master
 
+permissions: {}
+
 # Comment env block if you do not want to apply fixes
 env:
   # Apply linter fixes configuration
@@ -43,7 +45,7 @@ jobs:
     # Give the default GITHUB_TOKEN write permission to commit and push, comment
     # issues, and post new Pull Requests; remove the ones you do not need
     permissions:
-      contents: write
+      contents: read
       issues: write
       pull-requests: write
 
@@ -63,7 +65,7 @@ jobs:
 
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/latest/flavors/
-        uses: oxsecurity/megalinter@v8
+        uses: oxsecurity/megalinter@e08c2b05e3dbc40af4c23f41172ef1e068a7d651
 
         id: ml
 
@@ -113,7 +115,7 @@ jobs:
       # Create pull request if applicable
       # (for now works only on PR from same repository, not from forks)
       - name: Create Pull Request with applied fixes
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c
         id: cpr
         if: >-
           steps.ml.outputs.has_updated_sources == 1 &&
@@ -169,7 +171,7 @@ jobs:
         run: sudo chown -Rc $UID .git/
 
       - name: Commit and push applied linter fixes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403
         if: >-
           steps.ml.outputs.has_updated_sources == 1 &&
           (
