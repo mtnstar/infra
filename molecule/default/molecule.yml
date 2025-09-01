@@ -1,0 +1,7 @@
+---
+driver:
+  name: docker
+platforms:
+  - name: instance
+    image: ubuntu:24.04
+    pre_build_image: true
