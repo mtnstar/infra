@@ -12,6 +12,6 @@ docker run --rm -it \
   -v "$PWD":/src \
   -w /src \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  --user $(id -u):"${DOCKER_GID}" \
+  --user "$(id -u)":"${DOCKER_GID}" \
   ansible-molecule:latest \
-  $@
+  "$@"
