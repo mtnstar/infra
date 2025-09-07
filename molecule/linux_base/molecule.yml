@@ -5,3 +5,9 @@ platforms:
   - name: instance
     image: ubuntu:24.04
     pre_build_image: true
+provisioner:
+  name: ansible
+  options:
+    v: true
+  env:
+    ANSIBLE_ROLES_PATH: "../../roles"
