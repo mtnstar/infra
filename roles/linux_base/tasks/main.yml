@@ -35,44 +35,23 @@
     group: root
     mode: "0755"
 
-- name: Set timezone to Europe/Zurich
-  file:
-    src: /usr/share/zoneinfo/Europe/Zurich
-    dest: /etc/localtime
-    state: link
-    force: true
+- name: install util-linux-extra for timezone setting
+  apt:
+    name: util-linux-extra
+    state: present
 
-- name: Write timezone to /etc/timezone
-  copy:
-    content: "Europe/Zurich\n"
-    dest: /etc/timezone
-    owner: root
-    group: root
-    mode: "0644"
-
-- name: Reconfigure tzdata
-  command: dpkg-reconfigure -f noninteractive tzdata
+- name: Set timezone
+  ansible.builtin.timezone:
+    name: "{{ timezone }}"
 
 - name: Disable IPv6 via sysctl
-  become: true
+  when: not (skip_ipv6_disable | default(false))
   sysctl:
     name: "{{ item }}"
     value: "1"
     state: present
     sysctl_set: true
     reload: true
-  loop:
-    - net.ipv6.conf.all.disable_ipv6
-    - net.ipv6.conf.default.disable_ipv6
-    - net.ipv6.conf.lo.disable_ipv6
-
-- name: Ensure IPv6 is disabled in /etc/sysctl.conf
-  become: true
-  lineinfile:
-    path: /etc/sysctl.conf
-    regexp: "^{{ item }}"
-    line: "{{ item }} = 1"
-    state: present
   loop:
     - net.ipv6.conf.all.disable_ipv6
     - net.ipv6.conf.default.disable_ipv6
