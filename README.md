@@ -18,5 +18,9 @@ directory structure:
 ## Getting Started
 
 - clone this repository
-- install ansible and required collections
+- `./bin/init.sh` to set up local environment
 - customize inventory files in the `inventories` directory
+
+## Running molecule tests
+
+`./bin/molecule.sh -s linux_base`
