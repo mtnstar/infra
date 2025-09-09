@@ -13,5 +13,5 @@ docker run --rm -it \
   -w /src \
   -v /var/run/docker.sock:/var/run/docker.sock \
   --user "$(id -u)":"${DOCKER_GID}" \
-  localhost/ansible-molecule:latest \
+  "local/infra-ansible-molecule:latest" \
   "$@"

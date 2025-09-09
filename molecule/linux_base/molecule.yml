@@ -3,7 +3,7 @@ driver:
   name: docker
 platforms:
   - name: instance
-    image: localhost/ubuntu-test:24.04
+    image: local/infra-ubuntu-test:24.04
     pre_build_image: true
 provisioner:
   name: ansible

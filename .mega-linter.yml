@@ -22,3 +22,5 @@ SHOW_ELAPSED_TIME: true
 
 # Uncomment if you want MegaLinter to detect errors but not block CI to pass
 # DISABLE_ERRORS: true
+
+PYTHON_BANDIT_FILTER_REGEX_EXCLUDE: ^molecule?/
