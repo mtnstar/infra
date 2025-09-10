@@ -1,5 +1,7 @@
 # Ansible Infrastructure Repository
 
+🚀✨🙌💡🔥🌟🎉🥇👏
+
 this is my ansible repo for managing infrastructure and deployments including:
 
 - linux system config
