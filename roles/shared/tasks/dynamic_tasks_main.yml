@@ -1,0 +1,24 @@
+---
+# symlinked from roles/shared/task/dynamic_tasks_main.yml
+# this includes all tasks except of main.yml in a roles tasks folder.
+
+- name: Find all task files for role {{ role_name }} (ignore main.yml)
+  delegate_to: localhost
+  become: false
+  find:
+    paths: "{{ role_path }}/tasks"
+    patterns: "*.yml"
+    excludes: "main.yml"
+  register: found_task_files
+
+- name: Build task list from filenames
+  set_fact:
+    all_tasks: "{{ found_task_files.files | map(attribute='path') | map('basename') | map('regex_replace', '\\.yml$', '') | list }}"
+
+- name: Choose which tasks to run
+  set_fact:
+    chosen_tasks: "{{ tasks | default(all_tasks) }}"
+
+- name: Run selected task files
+  include_tasks: "{{ item }}.yml"
+  loop: "{{ chosen_tasks }}"

@@ -1,0 +1,8 @@
+- name: install util-linux-extra for timezone setting
+  apt:
+    name: util-linux-extra
+    state: present
+
+- name: Set timezone
+  ansible.builtin.timezone:
+    name: "{{ timezone }}"
