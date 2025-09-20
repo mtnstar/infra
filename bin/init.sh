@@ -7,3 +7,5 @@ ansible-galaxy collection install -r requirements.yml
 docker build -f "$SCRIPT_DIR"/Molecule.dockerfile \
   --build-arg USER_ID="$(id -u)" \
   -t "local/infra-ansible-molecule" "$SCRIPT_DIR"
+
+docker build -f "$SCRIPT_DIR"/Ubuntu-24.04-test.dockerfile -t local/infra-ubuntu-test:24.04 "$SCRIPT_DIR"

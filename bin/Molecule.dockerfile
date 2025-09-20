@@ -29,6 +29,8 @@ WORKDIR /src
 RUN pip install --no-cache-dir --upgrade pip==24.0 \
       molecule==25.7.0 \
       ansible==11.9.0 \
+      pytest \ 
+      testinfra \
       molecule-plugins[docker]==25.8.12
 
 HEALTHCHECK CMD molecule --version || exit 1
