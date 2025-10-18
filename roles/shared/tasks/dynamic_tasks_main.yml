@@ -3,7 +3,7 @@
 # this includes all tasks except of main.yml in a roles tasks folder.
 
 - name: Find all task files for role {{ role_name }} (ignore main.yml)
-  delegate_to: localhost
+  delegate_to: localhost # DevSkim: ignore DS162092 -- delegate_to localhost is intentionally
   become: false
   find:
     paths: "{{ role_path }}/tasks"
