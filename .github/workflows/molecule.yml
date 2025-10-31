@@ -10,22 +10,11 @@ permissions: {}
 jobs:
   molecule:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mtnstar/mtn-shell:latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.x"
-
-      - name: Install dependencies.
-        # create central requirements.txt to manage versions in one place
-        run: pip3 install --upgrade pip==24.0 molecule==25.7.0 ansible==11.9.0 pytest testinfra molecule-plugins[docker]==25.8.12
-
-      - name: Install Galaxy dependencies.
-        # create central requirements.txt to manage versions in one place
-        run: ansible-galaxy collection install community.docker
 
       - name: Run molecule
         run: "molecule test -s linux_base"
