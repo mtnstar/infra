@@ -10,12 +10,14 @@ permissions: {}
 jobs:
   molecule:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/mtnstar/mtn-shell:latest
-      options: --user 1001:1001
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Run molecule
-        run: "molecule test -s linux_base"
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}":/work \
+            -w /work \
+            ghcr.io/mtnstar/mtn-shell:latest \
+            bash -c "cd /work && molecule test -s linux_base"
