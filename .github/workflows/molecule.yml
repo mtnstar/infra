@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/mtnstar/mtn-shell:latest
+      options: --user 1001:1001
     steps:
       - name: Checkout
         uses: actions/checkout@v4
