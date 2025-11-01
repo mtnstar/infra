@@ -14,10 +14,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install Podman
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y podman
+          podman --version
+
       - name: Run molecule
         run: |
-          docker run --rm \
+          podman run --rm \
             -v "${{ github.workspace }}":/work \
             -w /work \
+            --userns=keep-id:uid=$(id -u),gid=$(id -g) \
             ghcr.io/mtnstar/mtn-shell:latest \
-            bash -c "cd /work && molecule test -s linux_base"
+            sh -c "id && ls -lah /home/mtn-admin && cd /work && molecule test -s linux_base"
