@@ -1,9 +1,9 @@
 ---
 driver:
-  name: docker
+  name: podman
 platforms:
   - name: instance
-    image: local/infra-ubuntu-test:24.04
+    image: ghcr.io/mtnstar/infra-test-ubuntu:24.04
     pre_build_image: true
 verifier:
   name: testinfra
