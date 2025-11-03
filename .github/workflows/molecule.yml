@@ -27,4 +27,4 @@ jobs:
             -v /var/run/user/$(id -u)/podman/podman.sock:/var/run/user/1000/podman/podman.sock \
             --userns=keep-id:uid=$(id -u),gid=$(id -g) \
             ghcr.io/mtnstar/mtn-shell:latest \
-            sh -c "id && ls -lah /home/mtn-admin && cd /work && molecule test -s linux_base"
+            sh -c 'id && ls -lah /home/mtn-admin && cd /work && molecule test -s linux_base'
