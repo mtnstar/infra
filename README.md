@@ -13,16 +13,18 @@ this is my ansible repo for managing infrastructure and deployments including:
 
 directory structure:
 
-* inventories: holds different environment inventories (e.g., production, staging)
-* roles: contains reusable Ansible roles for various services and configurations
-* playbooks: contains playbooks for deploying and managing services
+- inventories: holds different environment inventories (e.g., production, staging)
+- roles: contains reusable Ansible roles for various services and configurations
+- playbooks: contains playbooks for deploying and managing services
 
 ## Getting Started
 
+- start mtn-shell (see github.com/mtnstar/mtn-shell)
 - clone this repository
-- `./bin/init.sh` to set up local environment
 - customize inventory files in the `inventories` directory
 
 ## Running molecule tests
 
-`./bin/molecule.sh -s linux_base`
+inside mtn-shell in this repo run `molecule -s linux_base`
+
+as test container, https://github.com/mtnstar/infra-test-ubuntu is used
