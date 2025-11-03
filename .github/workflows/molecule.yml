@@ -14,10 +14,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Podman
+      - name: Start podman service
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y podman
           podman --version
           systemctl --user start podman.socket
 
