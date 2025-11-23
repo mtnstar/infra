@@ -1,0 +1,3 @@
+ansible_user: "default-admin"
+ansible_port: 22
+timezone: "Europe/Zurich"

@@ -1,0 +1,2 @@
+[linux_base]
+testhost ansible_host=172.16.42.42
