@@ -7,7 +7,8 @@
   become: false
   find:
     paths: "{{ role_path }}/tasks"
-    patterns: "*.yml"
+    use_regex: true
+    patterns: '^[0-9]+_[a-z0-9-]+\.yml$'
     excludes: "main.yml"
   register: found_task_files
 
@@ -15,9 +16,17 @@
   set_fact:
     all_tasks: "{{ found_task_files.files | map(attribute='path') | map('basename') | map('regex_replace', '\\.yml$', '') | list }}"
 
+- name: List available tasks
+  debug:
+    msg: "available tasks: {{ all_tasks | join(', ') }}"
+
 - name: Choose which tasks to run
   set_fact:
     chosen_tasks: "{{ tasks | default(all_tasks) }}"
+
+- name: List tasks to be exectued
+  debug:
+    msg: "tasks to be executed: {{ chosen_tasks | join(', ') }}"
 
 - name: Run selected task files
   include_tasks: "{{ item }}.yml"

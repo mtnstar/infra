@@ -23,6 +23,18 @@ directory structure:
 - clone this repository
 - customize inventory files in the `inventories` directory
 
+## Dynamic Role Tasks
+
+for every role, the `tasks/main.yml` is symlinked from `roles/shared/tasks/dynamic_tasks_main.yml`. This enables us to split up role's tasks easely into seperate files which makes the code cleaner. It also makes it possible to only run a role's specific tasks by defining param tasks:
+
+`ansible-playbook -i inventories/development linux_base -e 'tasks=[1_hostname,5_timezone]'`
+
+just add new task ymls in the format `1_mynewtask.yml` to `roles/$ROLE/tasks/` where as the leading number defines the order the task is being executed.
+
+- see `roles/linux_base/tasks` for an example
+- when creating a new role, symlink `roles/shared/tasks/dynamic_tasks_main.yml` to it's `tasks/main.yml`
+- add main.yml path to `.prettierignore` since it hates symlinks ;) 
+
 ## Running molecule tests
 
 inside mtn-shell in this repo run `molecule -s linux_base`
