@@ -1,0 +1,7 @@
+- name: Update linux base and reboot if necessary
+  hosts: all
+  become: true
+  tasks:
+    - include_role:
+        name: linux_base
+        tasks_from: update
