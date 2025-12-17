@@ -4,4 +4,4 @@ the goal of this role is to setup linux system after it has been bootstrapped wi
 
 to run this role/playbook against a freshly bootstraped host, use the following command:
 
-`ansible-playbook -i inventories/production/hosts playbooks/linux_bootstrap.yml --limit=my-new-host -e ansible_user=mtn-bootstrap`
+`ansible-playbook -i inventories/production/hosts playbooks/linux_bootstrap.yml --limit=my-new-host -e ansible_user=default-bootstrap`

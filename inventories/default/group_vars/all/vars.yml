@@ -1,5 +1,6 @@
 infra_admin_username: "default-admin"
-# TODO: replace by vault variable, password: default
+# replace by vault variable in production, password: default
+# infra_admin_password_hash: "{{ vault_infra_admin_password_hash }}"
 infra_admin_password_hash: "$6$ZF6Lc6vc/YqokyS9$EvSVTCabRR3li8ZDnMEKL1BRMkAX2Hx5pfrqMRlhTRc4VW7zhX7UXKRq3zQeiIxZw0Mx/Km9GDNPX5njJ.by0/"
 ansible_user: "{{ infra_admin_username }}"
 timezone: "Europe/Zurich"
