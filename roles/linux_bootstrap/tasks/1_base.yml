@@ -1,0 +1,9 @@
+---
+- name: Set hostname using inventory_hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Remove cloud-init package
+  ansible.builtin.package:
+    name: cloud-init
+    state: absent

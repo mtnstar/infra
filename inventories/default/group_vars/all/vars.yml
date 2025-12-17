@@ -1,3 +1,6 @@
-ansible_user: "default-admin"
+infra_admin_username: "default-admin"
 ansible_port: 22
+ansible_user: "{{ infra_admin_username }}"
 timezone: "Europe/Zurich"
+motd_message_url: "https://github.com/mtnstar/infra"
+bootstrap_user: "default-bootstrap"

@@ -1,0 +1,6 @@
+- name: Playbook to run once after initial Linux installation
+  hosts: all
+  remote_user: "{{ bootstrap_user }}"
+  become: true
+  roles:
+    - linux_bootstrap
