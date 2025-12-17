@@ -1,0 +1,50 @@
+---
+- name: Ensure ansible user exists
+  user:
+    name: "{{ infra_admin_username }}"
+    uid: 4242
+    shell: /bin/bash
+    groups: sudo
+    state: present
+    password: "{{ infra_admin_password_hash }}"
+    create_home: true
+
+- name: Allow {{ infra_admin_username }} to run all sudo commands without password
+  copy:
+    dest: "/etc/sudoers.d/99-{{ infra_admin_username }}-nopasswd"
+    content: |
+      {{ infra_admin_username }} ALL=(ALL) NOPASSWD: ALL
+    owner: root
+    group: root
+    mode: 0440
+
+- name: Ensure .ssh directory exists
+  file:
+    path: "/home/{{ infra_admin_username }}/.ssh"
+    state: directory
+    owner: "{{ infra_admin_username }}"
+    group: "{{ infra_admin_username }}"
+    mode: "0700"
+
+- name: Concatenate keys to authorized_keys
+  shell: "cat {{ inventory_dir }}/ssh_keys/*.pub > {{ role_path }}/tmp/authorized_keys"
+  become: false
+  delegate_to: localhost # DevSkim: ignore DS162092 -- delegate_to localhost is intentionally
+
+- name: Copy authorized_keys to remote host
+  copy:
+    src: "{{ role_path }}/tmp/authorized_keys"
+    dest: "/home/{{ infra_admin_username }}/.ssh/authorized_keys"
+    mode: "0400"
+
+- name: Ensure correct permissions for authorized_keys
+  file:
+    path: "/home/{{ infra_admin_username }}/.ssh/authorized_keys"
+    owner: "{{ infra_admin_username }}"
+    group: "{{ infra_admin_username }}"
+    mode: "0400"
+
+- name: Remove copied keys directory from remote
+  file:
+    path: "{{ role_path }}/files/keys/authorized_keys"
+    state: absent

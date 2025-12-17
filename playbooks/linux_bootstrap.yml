@@ -1,0 +1,5 @@
+- name: Playbook to run once after initial Linux installation
+  hosts: all
+  become: true
+  roles:
+    - linux_bootstrap

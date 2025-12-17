@@ -22,7 +22,7 @@
 
 - name: Choose which tasks to run
   set_fact:
-    chosen_tasks: "{{ tasks | default(all_tasks) }}"
+    chosen_tasks: "{{ task_list | default(all_tasks) }}"
 
 - name: List tasks to be exectued
   debug:
