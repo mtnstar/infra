@@ -1,0 +1,31 @@
+- name: Ensure sudo is installed
+  apt:
+    name: sudo
+
+- name: Allow {{ infra_admin_username }} to run all sudo commands without password
+  copy:
+    dest: "/etc/sudoers.d/99-{{ infra_admin_username }}-nopasswd"
+    content: |
+      {{ infra_admin_username }} ALL=(ALL) NOPASSWD: ALL
+    owner: root
+    group: root
+    mode: 0440
+
+- name: Make sure password for {{ infra_admin_username }} is set for console only login (no ssh)
+  user:
+    name: "{{ infra_admin_username }}"
+    password: "{{ infra_admin_password_hash }}"
+
+- name: Add infra ansible managed MOTD script
+  copy:
+    dest: /etc/update-motd.d/60-infra-ansible-managed
+    content: |
+      #!/bin/sh
+      echo ""
+      echo "🚀  This system is managed by Ansible! 🚀"
+      echo ""
+      echo "{{ motd_message_url }}"
+      echo ""
+    owner: root
+    group: root
+    mode: "0755"
