@@ -21,7 +21,8 @@ directory structure:
 
 - start mtn-shell (see github.com/mtnstar/mtn-shell)
 - clone this repository
-- customize inventory files in the `inventories` directory
+- copy default inventory directory and customize it (e.g. ./inventories/default -> ./inventories/production)
+- add desired public ssh keys to `inventories/production/ssh_keys/*.pub`
 
 ## Dynamic Role Tasks
 
