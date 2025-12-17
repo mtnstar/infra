@@ -29,12 +29,13 @@
 - name: Concatenate keys to authorized_keys
   shell: "cat {{ inventory_dir }}/ssh_keys/*.pub > {{ role_path }}/tmp/authorized_keys"
   become: false
-  delegate_to: localhost
+  delegate_to: localhost # DevSkim: ignore DS162092 -- delegate_to localhost is intentionally
 
 - name: Copy authorized_keys to remote host
   copy:
     src: "{{ role_path }}/tmp/authorized_keys"
     dest: "/home/{{ infra_admin_username }}/.ssh/authorized_keys"
+    mode: "0400"
 
 - name: Ensure correct permissions for authorized_keys
   file:
