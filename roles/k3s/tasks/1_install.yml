@@ -1,0 +1,107 @@
+---
+- name: Update apt cache
+  apt: 
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: set k3s token file path
+  set_fact:
+    k3s_token_file: /var/lib/rancher/k3s/server/node-token
+
+- name: get k3s master ip
+  set_fact:
+    k3s_master_ip: "{{ hostvars['k3s-1']['ansible_default_ipv4']['address'] }}"
+
+- name: Install required dependencies
+  apt:
+    name:  
+      - curl
+      - apt-transport-https
+    state: present
+
+- name: Download k3s installation script
+  get_url:  
+    url: https://get.k3s.io
+    dest: /tmp/k3s-install. sh
+    mode: '0755'
+
+- name: Install k3s on first server (master)
+  shell: /tmp/k3s-install.sh
+  args:
+    creates:  /usr/local/bin/k3s
+  environment:
+    INSTALL_K3S_EXEC: "server --cluster-init"
+  when: inventory_hostname == 'k3s-1'
+
+- name: Wait for k3s to be ready on master
+  wait_for: 
+    path: "{{ k3s_token_file }}"
+    timeout:  60
+  when: inventory_hostname == 'k3s-1'
+
+- name: Read k3s token from master
+  slurp:
+    src:  "{{ k3s_token_file }}"
+  register:  k3s_token
+  when: inventory_hostname == 'k3s-1'
+
+- name: Store k3s token as fact
+  set_fact: 
+    k3s_cluster_token: "{{ k3s_token['content'] | b64decode | trim }}"
+  when: inventory_hostname == 'k3s-1'
+
+- name: Install k3s on additional server nodes
+  shell:  /tmp/k3s-install.sh
+  args:
+    creates: /usr/local/bin/k3s
+  environment: 
+    K3S_URL:  "https://{{ k3s_master_ip }}:6443"
+    K3S_TOKEN:  "{{ hostvars['k3s-1']['k3s_cluster_token'] }}"
+    INSTALL_K3S_EXEC: "server"
+  when: 
+    - "'k3s_servers' in group_names"
+    - inventory_hostname != 'k3s-1'
+
+- name: Install k3s on agent nodes
+  shell: /tmp/k3s-install.sh
+  args:
+    creates: /usr/local/bin/k3s
+  environment:
+    K3S_URL: "https://{{ k3s_master_ip }}:6443"
+    K3S_TOKEN: "{{ hostvars['k3s-1']['k3s_cluster_token'] }}"
+    INSTALL_K3S_EXEC:  "agent"
+  when: "'k3s_agents' in group_names"
+
+- name:  Ensure k3s service is enabled and started
+  systemd:
+    name: k3s
+    enabled:   yes
+    state: started
+  when: "'k3s_servers' in group_names"
+
+- name:  Ensure k3s-agent service is enabled and started
+  systemd:
+    name: k3s-agent
+    enabled:  yes
+    state: started
+  when: "'k3s_agents' in group_names"
+
+- name: Get k3s version
+  command:   k3s --version
+  register: k3s_version
+  changed_when: false
+
+- name: Display k3s version
+  debug: 
+    msg:  "{{ k3s_version.stdout }}"
+
+- name:  Get cluster nodes
+  command: kubectl get nodes
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: cluster_nodes
+  changed_when: false
+
+- name: Show cluster nodes
+  debug: 
+    msg: "{{ cluster_nodes.stdout_lines }}"
