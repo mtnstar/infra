@@ -22,7 +22,7 @@
 - name: Download k3s installation script
   get_url:  
     url: https://get.k3s.io
-    dest: /tmp/k3s-install. sh
+    dest: /tmp/k3s-install.sh
     mode: '0755'
 
 - name: Install k3s on first server (master)
