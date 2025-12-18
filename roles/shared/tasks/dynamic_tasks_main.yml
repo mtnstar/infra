@@ -14,7 +14,7 @@
 
 - name: Build task list from filenames
   set_fact:
-    all_tasks: "{{ found_task_files.files | map(attribute='path') | map('basename') | map('regex_replace', '\\.yml$', '') | list }}"
+    all_tasks: "{{ found_task_files.files | sort(attribute='path') | map(attribute='path') | map('basename') | map('regex_replace', '\\.yml$', '') | list }}"
 
 - name: List available tasks
   debug:
