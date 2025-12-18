@@ -25,7 +25,7 @@ jobs:
             -v "${{ github.workspace }}":/work \
             -w /work \
             -v "/var/run/user/$(id -u)/podman/podman.sock:/var/run/user/1000/podman/podman.sock" \
-            -v "${{ github.workspace }}/molecule/.ansible_vault_pass.txt":/home/mtn-admin/.ansible_vault_pass.txt:ro \
+            -v "${{ github.workspace }}/inventories/default/.ansible_vault_pass.txt":/home/mtn-admin/.ansible_vault_pass.txt:ro \
             --userns=keep-id:uid="$(id -u)",gid="$(id -g)" \
             ghcr.io/mtnstar/mtn-shell:latest \
             sh -c 'id && ls -lah /home/mtn-admin && cd /work && molecule test -s linux_base'
