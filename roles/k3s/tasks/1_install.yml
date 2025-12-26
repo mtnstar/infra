@@ -1,9 +1,4 @@
 ---
-- name: Update apt cache
-  apt: 
-    update_cache: yes
-    cache_valid_time: 3600
-
 - name: set k3s token file path
   set_fact:
     k3s_token_file: /var/lib/rancher/k3s/server/node-token

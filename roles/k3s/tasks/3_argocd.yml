@@ -1,0 +1,52 @@
+---
+- name: set argocd version
+  set_fact:
+    argocd_version: "stable"
+
+- name: set k3s config path
+  set_fact:
+    kubeconfig: "/etc/rancher/k3s/k3s.yaml"
+
+- name: Install Kubernetes Python library
+  pip:
+    name: kubernetes
+    state: present
+    executable: pip3
+    extra_args: --break-system-packages
+
+- name: Create argocd namespace
+  kubernetes.core.k8s:
+    name: argocd
+    api_version: v1
+    kind:  Namespace
+    kubeconfig: "{{ kubeconfig }}"
+    state: present
+
+- name: Deploy ArgoCD
+  kubernetes.core.k8s:
+    state: present
+    namespace: argocd
+    kubeconfig: "{{ kubeconfig }}"
+    src: "https://raw.githubusercontent.com/argoproj/argo-cd/{{ argocd_version }}/manifests/install.yaml"
+
+- name: Wait for ArgoCD server deployment to exist
+  kubernetes.core.k8s_info:
+    kind:  Deployment
+    namespace: argocd
+    name: argocd-server
+    kubeconfig:  "{{ kubeconfig }}"
+    wait: yes
+    wait_timeout: 300
+
+- name: Get ArgoCD initial admin password
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: argocd
+    name: argocd-initial-admin-secret
+    kubeconfig: "{{ kubeconfig }}"
+  register: argocd_secret
+
+- name:  Display ArgoCD admin password
+  debug:
+    msg: "ArgoCD admin password: {{ argocd_secret.resources[0].data.password | b64decode }}"
+  when: argocd_secret. resources | length > 0

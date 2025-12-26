@@ -6,4 +6,5 @@
       - curl
       - vim
       - python3-pip
+      - net-tools
     state: present

@@ -1,6 +1,6 @@
 ---
 - name: Install kvm and related packages
-  apt:
+  package:
     name:  
       - qemu-kvm
       - libvirt-daemon-system
