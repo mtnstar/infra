@@ -1,0 +1,8 @@
+---
+- name: Install kvm and related packages
+  apt:
+    name:  
+      - qemu-kvm
+      - libvirt-daemon-system
+      - libvirt-clients
+    state: present
