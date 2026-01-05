@@ -5,11 +5,9 @@
 this is my ansible repo for managing infrastructure and deployments including:
 
 - linux system config
-- nextcloud
-- mailpit
-- vaultwarden
-- p2p stack: deluge, radarr, sonarr, ...
-- plex server
+- k3s cluster setup
+- postgresql server
+- all other deployments are managed with kustomize for deployment on k3s
 
 directory structure:
 
