@@ -1,0 +1,10 @@
+---
+- name: Kill all processes belonging to {{ bootstrap_user }}
+  ansible.builtin.shell: |
+    pkill -u {{ bootstrap_user }} || true
+
+- name: Ensure user {{ bootstrap_user }} is removed along with home directory
+  ansible.builtin.user:
+    name: "{{ bootstrap_user }}"
+    state: absent
+    remove: true

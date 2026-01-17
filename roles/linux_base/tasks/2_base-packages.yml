@@ -7,4 +7,5 @@
       - vim
       - python3-pip
       - net-tools
+      - ssh
     state: present
