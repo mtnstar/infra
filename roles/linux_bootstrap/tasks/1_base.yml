@@ -10,5 +10,5 @@
 
 - name: Make sure netplan is still present (dependency of cloud-init)
   ansible.builtin.package:
-    name: netplan
+    name: netplan.io
     state: present
