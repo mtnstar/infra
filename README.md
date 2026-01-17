@@ -36,6 +36,6 @@ just add new task ymls in the format `1_mynewtask.yml` to `roles/$ROLE/tasks/` w
 
 ## Running molecule tests
 
-inside mtn-shell in this repo run `molecule -s linux_base`
+inside mtn-shell in this repo run `molecule test -s linux_base`
 
 as test container ghcr.io/mtnstar/infra-test-ubuntu:24.04 is used. (see https://github.com/mtnstar/infra-test-ubuntu)

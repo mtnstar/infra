@@ -1,5 +1,6 @@
 ---
 - name: Kill all processes belonging to {{ bootstrap_user }}
+  changed_when: false
   ansible.builtin.shell: |
     pkill -u {{ bootstrap_user }} || true
 

@@ -19,6 +19,7 @@ provisioner:
         hosts:
           instance:
             ansible_user: test-admin
+            bootstrap_user: test-bootstrap
             # admin password hash for 'test'
             infra_admin_password_hash: "$$6$$ro9AkmNC.NW/KyC9$$sGlcqEcnu4y2dQB179R0t6IREfrj3GWSCBRIhckdwPqWYZ1YU1wAhLQnRgaRhCZ8FIIxQh5TuoBvPHl/j4D/j0"
             timezone: "Europe/Zurich"
