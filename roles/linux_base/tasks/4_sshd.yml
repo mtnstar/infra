@@ -15,6 +15,15 @@
     backup: true
   notify: Restart sshd
 
+- name: Configure sshd port
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^Port"
+    line: "Port {{ sshd_port }}"
+    state: present
+    backup: true
+  notify: Restart sshd
+
 - name: Lock root account password
   ansible.builtin.user:
     name: root
