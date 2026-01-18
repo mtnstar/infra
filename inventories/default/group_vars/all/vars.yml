@@ -4,6 +4,6 @@ infra_admin_username: "default-admin"
 infra_admin_password_hash: "$6$ZF6Lc6vc/YqokyS9$EvSVTCabRR3li8ZDnMEKL1BRMkAX2Hx5pfrqMRlhTRc4VW7zhX7UXKRq3zQeiIxZw0Mx/Km9GDNPX5njJ.by0/"
 ansible_user: "{{ infra_admin_username }}"
 timezone: "Europe/Zurich"
-motd_message_url: "https://github.com/mtnstar/infra"
+#motd_message_url: "https://infra-git.example.com" # Uncomment and set a custom MOTD message URL if needed
 bootstrap_user: "default-bootstrap"
 #sshd_port: 22 # Uncomment and set a custom SSH port if needed

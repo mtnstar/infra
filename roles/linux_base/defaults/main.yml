@@ -1,2 +1,3 @@
 sshd_port: 22
 disable_ipv6: true
+motd_message_url: "https://github.com/mtnstar/infra"

@@ -1,0 +1,24 @@
+---
+- name: Ensure /etc/update-motd.d/60-unminimize is removed
+  file:
+    path: /etc/update-motd.d/60-unminimize
+    state: absent
+
+- name: Ensure /etc/update-motd.d/10-help-text is removed
+  file:
+    path: /etc/update-motd.d/10-help-text
+    state: absent
+
+- name: Add infra ansible managed MOTD script
+  copy:
+    dest: /etc/update-motd.d/60-infra-ansible-managed
+    content: |
+      #!/bin/sh
+      echo ""
+      echo "🚀  This system is managed by Ansible! 🚀"
+      echo ""
+      echo "{{ motd_message_url }}"
+      echo ""
+    owner: root
+    group: root
+    mode: "0755"
