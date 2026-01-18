@@ -1,0 +1,36 @@
+---
+- name: Install base packages
+  package:
+    name:
+      - netplan.io
+      - curl
+      - vim
+      - python3-pip
+      - net-tools
+      - ssh
+    state: present
+
+- name: Ensure unattended-upgrades is installed
+  apt:
+    name: unattended-upgrades
+    state: present
+
+- name: Ensure automatic updates are enabled
+  copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure unattended-upgrades service is enabled and running
+  systemd:
+    name: unattended-upgrades.service
+    enabled: true
+    state: started
+
+- name: Force a reload of unattended-upgrades configuration
+  command: dpkg-reconfigure -f noninteractive unattended-upgrades
+  changed_when: false
