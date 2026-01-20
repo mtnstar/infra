@@ -1,0 +1,8 @@
+- name: Install and configure dynamic dns client
+  hosts: dyndns_clients
+  become: yes
+  roles:
+    - role: linux_base
+      vars: 
+        task_list: ["1_update-apt-cache"]
+    - role: dyndns_client

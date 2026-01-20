@@ -1,0 +1,4 @@
+dyndns_username: "dyndns-alice"
+dyndns_server: "dyndns.example.com"
+dyndns_password: "{{ vault_ddclient_password }}"
+dyndns_hostname: "dynhost.alice.example.com"

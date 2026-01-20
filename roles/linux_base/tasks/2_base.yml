@@ -8,7 +8,16 @@
       - python3-pip
       - net-tools
       - ssh
+      - cron
+      - dnsutils
     state: present
+
+- name:  Ensure cron service is running
+  ansible.builtin.systemd:
+    name: cron
+    state: started
+    enabled: yes
+  become: yes
 
 - name: Ensure unattended-upgrades is installed
   apt:

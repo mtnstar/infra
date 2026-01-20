@@ -1,0 +1,22 @@
+#!/bin/bash
+# DynDNS update script
+# Managed by Ansible - DO NOT EDIT MANUALLY
+
+DYNDNS_URL="{{ dyndns_server }}"
+HOSTNAME="{{ dyndns_hostname }}"
+USERNAME="{{ dyndns_username }}"
+PASSWORD="{{ dyndns_password }}"
+LOG_FILE="/var/log/dyndns_update.log"
+
+# Build the full URL
+FULL_URL="${DYNDNS_URL}?hn=${HOSTNAME}&u=${USERNAME}&pw=${PASSWORD}"
+
+# Make the request
+RESPONSE=$(curl -s -w "\nHTTP_CODE:%{http_code}\nTIME:%{time_total}s" "$FULL_URL")
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+
+echo "[$TIMESTAMP] $RESPONSE" >> "$LOG_FILE"
+
+tail -n 1000 "$LOG_FILE" > "$LOG_FILE.tmp" && mv "$LOG_FILE.tmp" "$LOG_FILE"
+
+exit 0
