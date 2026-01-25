@@ -1,0 +1,109 @@
+---
+- name: Create cert-manager namespace
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig }}"
+    name: "cert-manager"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Add cert-manager CRDs
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig }}"
+    state: present
+    src: "https://github.com/cert-manager/cert-manager/releases/download/{{ cert_manager_version }}/cert-manager.crds.yaml"
+
+- name: Install cert-manager using kubectl
+  shell: |
+    kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/{{ cert_manager_version }}/cert-manager.yaml
+  args:
+    executable: /bin/bash
+  register: cert_manager_install
+  changed_when: "'created' in cert_manager_install.stdout or 'configured' in cert_manager_install.stdout"
+
+- name: Wait for cert-manager to be ready
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconfig }}"
+    kind: Deployment
+    namespace: "cert-manager"
+    name: "{{ item }}"
+    wait: yes
+    wait_condition:
+      type: Available
+      status: "True"
+    wait_timeout: 300
+  loop:
+    - cert-manager
+    - cert-manager-cainjector
+    - cert-manager-webhook
+
+- name: Verify cert-manager installation
+  command: kubectl get pods -n cert-manager
+  register: cert_manager_pods
+  changed_when: false
+
+- name: Display cert-manager pods
+  debug:
+    var: cert_manager_pods.stdout_lines
+
+- name: Create self-signed ClusterIssuer for bootstrapping CA
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig }}"
+    state: present
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: selfsigned-issuer
+      spec:
+        selfSigned: {}
+
+- name: Create internal root CA certificate
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig }}"
+    state: present
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: internal-root-ca
+        namespace: "cert-manager"
+      spec:
+        isCA: true
+        commonName: "Internal Root CA"
+        secretName: "internal-ca"
+        duration: 87600h  # 10 years
+        renewBefore: 8760h  # 1 year
+        privateKey:
+          algorithm: RSA
+          encoding: PKCS1
+          size: 4096
+        issuerRef:
+          name: selfsigned-issuer
+          kind: ClusterIssuer
+          group: cert-manager.io
+
+- name: Wait for CA certificate to be ready
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconfig }}"
+    api_version: cert-manager.io/v1
+    kind: Certificate
+    name: internal-root-ca
+    namespace: "cert-manager"
+  register: ca_cert
+  until: ca_cert.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | map(attribute='status') | list | first == 'True'
+  retries: 30
+  delay: 10
+
+- name: Create ClusterIssuer using internal CA
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig }}"
+    state: present
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: "cert-manager"
+      spec:
+        ca:
+          secretName: "internal-ca"

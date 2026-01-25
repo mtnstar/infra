@@ -3,10 +3,6 @@
   set_fact:
     argocd_version: "stable"
 
-- name: set k3s config path
-  set_fact:
-    kubeconfig: "/etc/rancher/k3s/k3s.yaml"
-
 - name: Install Kubernetes Python library
   pip:
     name: kubernetes
@@ -50,40 +46,6 @@
   debug:
     msg: "ArgoCD admin password: {{ argocd_secret.resources[0].data.password | b64decode }}"
   when: argocd_secret. resources | length > 0
-
-- name: Wait for ArgoCD secret to be created
-  kubernetes.core.k8s_info:
-    kubeconfig: "{{ kubeconfig }}"
-    api_version: v1
-    kind: Secret
-    name: argocd-secret
-    namespace: argocd
-  register: argocd_secret
-  until: 
-    - argocd_secret.resources | length > 0
-    - argocd_secret.resources[0].data['tls.crt'] is defined
-  retries: 10
-  delay: 5
-
-- name: Create ArgoCD CA secret for Traefik
-  kubernetes.core.k8s:
-    kubeconfig: "{{ kubeconfig }}"
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: argocd-server-ca
-        namespace: argocd
-      type: Opaque
-      data:
-        tls.ca: "{{ argocd_secret.resources[0].data['tls.crt'] }}"
-
-- name: Create ArgoCD internal transport service
-  kubernetes.core.k8s:
-    kubeconfig:  "{{ kubeconfig }}"
-    state: present
-    definition: "{{ lookup('file', 'argocd-internal-transport.yaml') }}"
 
 - name: Create ArgoCD Ingress
   kubernetes.core.k8s:

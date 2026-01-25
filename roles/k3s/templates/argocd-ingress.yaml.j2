@@ -6,7 +6,6 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/service.serversscheme: https
-    traefik.ingress.kubernetes.io/service.serverstransport: argocd-internal@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:
@@ -19,7 +18,7 @@ spec:
           service:
             name: argocd-server
             port:
-              name: https
+              name: http
   tls:
   - hosts:
     - {{ argocd_domain }}
