@@ -26,6 +26,7 @@ alias kex='kubectl exec -it'
 
 # Enable kubectl completion if available
 if command -v kubectl &> /dev/null; then
+  # shellcheck disable=SC1090
   source <(kubectl completion bash)
   complete -F __start_kubectl k
 fi
