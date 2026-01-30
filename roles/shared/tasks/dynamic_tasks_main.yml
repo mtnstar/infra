@@ -22,12 +22,12 @@
 
 - name: Choose which tasks to run
   set_fact:
-    chosen_tasks: "{{ task_list | default(all_tasks) }}"
+    chosen_tasks: "{{ fixed_task_list | default(task_list) | default(all_tasks) }}"
 
 - name: List tasks to be exectued
   debug:
     msg: "tasks to be executed: {{ chosen_tasks | join(', ') }}"
 
 - name: Run selected task files
-  include_tasks: "{{ item }}.yml"
+  include_tasks: "{{ role_path}}/tasks/{{ item }}.yml"
   loop: "{{ chosen_tasks }}"

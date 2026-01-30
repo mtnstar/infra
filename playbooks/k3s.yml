@@ -4,5 +4,5 @@
   roles:
     - role: linux_base
       vars: 
-        task_list: ["1_update-apt-cache"]
+        fixed_task_list: ["1_update-apt-cache"]
     - role: k3s
