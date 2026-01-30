@@ -58,7 +58,7 @@
       spec:
         selfSigned: {}
 
-- name: Create internal root CA certificate
+- name: Create internal CA certificate
   kubernetes.core.k8s:
     kubeconfig: "{{ kubeconfig }}"
     state: present
@@ -66,7 +66,7 @@
       apiVersion: cert-manager.io/v1
       kind: Certificate
       metadata:
-        name: internal-root-ca
+        name: internal-ca
         namespace: "cert-manager"
       spec:
         isCA: true
@@ -88,7 +88,7 @@
     kubeconfig: "{{ kubeconfig }}"
     api_version: cert-manager.io/v1
     kind: Certificate
-    name: internal-root-ca
+    name: internal-ca
     namespace: "cert-manager"
   register: ca_cert
   until: ca_cert.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | map(attribute='status') | list | first == 'True'
