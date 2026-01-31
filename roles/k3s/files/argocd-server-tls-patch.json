@@ -1,0 +1,28 @@
+{
+  "spec": {
+    "template": {
+      "spec": {
+        "volumes": [
+          {
+            "name": "argocd-tls-cert",
+            "secret": {
+              "secretName": "argocd-server-tls"
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "argocd-server",
+            "volumeMounts": [
+              {
+                "name": "tls-certs",
+                "mountPath": "/app/config/tls",
+                "readOnly": true
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
