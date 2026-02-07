@@ -15,14 +15,14 @@ spec:
         - name: argocd-server
           port: https
           serversTransport: argocd-internal-servers-transport
-    - kind: Rule
-      match: Host(`{{ argocd_hostname }}`) && Headers(`Content-Type`, `application/grpc`)
-      priority: 11
-      services:
-        - name: argocd-server
-          port: 443
-          scheme: h2c
-          serversTransport: argocd-internal-servers-transport
+#    - kind: Rule
+#      match: Host(`{{ argocd_hostname }}`) && Headers(`Content-Type`, `application/grpc`)
+#      priority: 11
+#      services:
+#        - name: argocd-server
+#          port: 443
+#          scheme: h2c
+#          serversTransport: argocd-internal-servers-transport
   tls:
     #certResolver: letsencrypt
     domains:

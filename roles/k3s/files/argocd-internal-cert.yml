@@ -5,7 +5,7 @@ metadata:
   name: argocd-server-tls
   namespace: argocd
 spec:
-  secretName: argocd-server-tls
+  secretName: argocd-server
   issuerRef:
     name: internal-ca
     kind: ClusterIssuer
