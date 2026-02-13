@@ -1,0 +1,5 @@
+- name: Apply linux router configuration
+  hosts: linux_router
+  become: true
+  roles:
+    - linux_router
