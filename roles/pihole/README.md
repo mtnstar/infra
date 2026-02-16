@@ -1,1 +1,1 @@
-# Pihole DNS
+# Pihole

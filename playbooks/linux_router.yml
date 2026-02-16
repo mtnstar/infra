@@ -2,6 +2,6 @@
   hosts: linux_routers
   become: true
   roles:
-    #- linux_router
-    #- docker-compose
+    - linux_router
+    - docker-compose
     - pihole

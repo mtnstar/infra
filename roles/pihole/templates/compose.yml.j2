@@ -2,10 +2,7 @@ services:
   pihole:
     image: "ghcr.io/pi-hole/pihole:{{ pihole_version_tag }}"
     restart: unless-stopped
-    ports:
-      - "{{ ansible_default_ipv4.address }}:53:53/udp"
-      - "{{ ansible_default_ipv4.address }}:53:53/tcp"
-      - "{{ ansible_default_ipv4.address }}:443:443"
+    network_mode: host
     environment:
       TZ: "{{ timezone }}"
       FTLCONF_webserver_api_password: "go"

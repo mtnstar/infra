@@ -1,3 +1,4 @@
+---
 - name: Install required system packages
   apt:
     name:
@@ -16,7 +17,7 @@
 
 - name: Add Docker apt repository
   apt_repository:
-    repo: "deb [arch={{ arch }}] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    repo: "deb [arch={{ arch }}] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable"
     state: present
     filename: docker
 
