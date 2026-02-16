@@ -1,0 +1,31 @@
+---
+- name: set authentik container compose directory
+  set_fact:
+    container_compose_dir: "/containers/pihole"
+
+- name: Create Pi-hole directories
+  file:
+    path: "{{ dir }}"
+    state: directory
+    mode: "0770"
+    owner: "1000"
+    group: "1000"
+  loop_control:
+    loop_var: dir
+  loop:
+    - "{{ container_compose_dir }}"
+    - "{{ container_compose_dir }}/conf"
+    - "{{ container_compose_dir }}/conf/dnsmasq.d"
+
+- name: Template compose.yml
+  template:
+    src: compose.yml.j2
+    dest: "{{ container_compose_dir }}/compose.yml"
+    mode: "0644"
+
+- name: Start services with Docker Compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ container_compose_dir }}"
+    state: present
+    pull: always
+    recreate: always

@@ -1,5 +1,7 @@
 - name: Apply linux router configuration
-  hosts: linux_router
+  hosts: linux_routers
   become: true
   roles:
-    - linux_router
+    #- linux_router
+    #- docker-compose
+    - pihole
