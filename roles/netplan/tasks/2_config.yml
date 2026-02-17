@@ -1,0 +1,36 @@
+---
+- name: Find netplan configs for host
+  delegate_to: localhost
+  become: false
+  find:
+    paths: "{{ inventory_dir }}/netplan_configs/{{ inventory_hostname }}"
+    patterns: "*.yaml"
+  register: netplan_configs
+
+- name: Copy all netplan configs to host
+  copy:
+    src: "{{ config.path }}"
+    dest: "/etc/netplan/{{ config.path | basename }}"
+    owner: root
+    group: root
+    mode: "0600"
+  loop_control:
+    loop_var: config
+  loop: "{{ netplan_configs.files }}"
+  when: netplan_configs.matched > 0
+
+- name: Remove default netplan config if host has custom configs
+  file:
+    path: /etc/netplan/50-cloud-init.yaml
+    state: absent
+  when: netplan_configs.matched > 0
+
+- name: Validate netplan configuration
+  command: netplan try --timeout=10
+  when: netplan_configs.matched > 0
+  register: netplan_validation
+  failed_when: netplan_validation.rc != 0
+
+- name: Apply netplan configuration
+  command: netplan apply
+  when: netplan_configs.matched > 0 and netplan_validation.rc == 0
