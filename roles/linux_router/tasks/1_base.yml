@@ -3,7 +3,7 @@
   package:
     name:
       - nftables
-      - python3-nftables # For Ansible nftables module
+      - ufw
     state: present
 
 - name: Enable and start nftables service
