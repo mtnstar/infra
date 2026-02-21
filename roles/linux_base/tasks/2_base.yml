@@ -17,7 +17,6 @@
     name: cron
     state: started
     enabled: yes
-  become: yes
 
 - name: Ensure unattended-upgrades is installed
   apt:

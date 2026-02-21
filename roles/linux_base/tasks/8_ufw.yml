@@ -1,5 +1,5 @@
 ---
-- name: Disable IPv6 in UFW if not supported
+- name: Disable IPv6 if cofigured
   lineinfile:
     path: /etc/default/ufw
     regexp: '^IPV6='
