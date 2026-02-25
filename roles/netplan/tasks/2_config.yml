@@ -1,6 +1,6 @@
 ---
 - name: Find netplan configs for host
-  delegate_to: localhost
+  delegate_to: localhost # DevSkim: ignore DS162092 -- delegate_to localhost is intentionally
   become: false
   find:
     paths: "{{ inventory_dir }}/netplan_configs/{{ inventory_hostname }}"
