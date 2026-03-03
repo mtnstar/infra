@@ -30,12 +30,14 @@
       kubeconfig: "{{ kubeconfig }}"
       kind: Deployment
       namespace: "cert-manager"
-      name: "{{ item }}"
+      name: "{{ deployment }}"
       wait: yes
       wait_condition:
         type: Available
         status: "True"
       wait_timeout: 300
+    loop_control:
+      loop_var: deployment
     loop:
       - cert-manager
       - cert-manager-cainjector

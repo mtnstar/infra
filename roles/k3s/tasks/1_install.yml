@@ -21,11 +21,11 @@
     mode: '0755'
 
 - name: Install k3s on first server (master)
-  shell: /tmp/k3s-install.sh
+  shell: "/tmp/k3s-install.sh"
   args:
     creates:  /usr/local/bin/k3s
   environment:
-    INSTALL_K3S_EXEC: "server --cluster-init"
+    INSTALL_K3S_EXEC: "server --cluster-init --flannel-backend=host-gw"
   when: inventory_hostname == 'k3s-1'
 
 - name: Wait for k3s to be ready on master
@@ -45,13 +45,13 @@
     k3s_cluster_token: "{{ k3s_token.content | b64decode | trim }}"
 
 - name: Install k3s on agent nodes
-  shell: /tmp/k3s-install.sh
+  shell: "/tmp/k3s-install.sh"
   args:
     creates: /usr/local/bin/k3s
   environment:
     K3S_URL: "https://{{ k3s_master_ip }}:6443"
     K3S_TOKEN: "{{ k3s_cluster_token }}"
-    INSTALL_K3S_EXEC:  "agent"
+    INSTALL_K3S_EXEC: "agent"
   when: 
     - inventory_hostname != 'k3s-1'
 
