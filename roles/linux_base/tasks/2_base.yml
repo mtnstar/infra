@@ -10,6 +10,7 @@
       - ssh
       - cron
       - dnsutils
+      - ufw
     state: present
 
 - name:  Ensure cron service is running
@@ -19,7 +20,7 @@
     enabled: yes
 
 - name: Ensure unattended-upgrades is installed
-  apt:
+  package:
     name: unattended-upgrades
     state: present
 

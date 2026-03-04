@@ -1,6 +1,6 @@
 ---
 - name: Install required system packages
-  apt:
+  package:
     name:
       - apt-transport-https
       - ca-certificates
@@ -22,7 +22,7 @@
     filename: docker
 
 - name: Update apt and install docker-ce and docker-compose-plugin
-  apt:
+  package:
     name:
       - docker-ce
       - docker-ce-cli
