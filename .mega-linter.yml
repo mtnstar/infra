@@ -24,3 +24,6 @@ SHOW_ELAPSED_TIME: true
 # DISABLE_ERRORS: true
 
 PYTHON_BANDIT_FILTER_REGEX_EXCLUDE: ^molecule?/
+
+EXCLUDED_DIRECTORIES:
+  - .git # config is created during megalinter ci run and king fisher complains about credential in there

@@ -12,7 +12,10 @@ on:
       - main
       - master
 
-permissions: {}
+permissions:
+  contents: read
+  issues: read
+  pull-requests: write
 
 # Comment env block if you do not want to apply fixes
 env:
@@ -28,7 +31,7 @@ env:
 
   # If APPLY_FIXES is used, defines if the fixes are directly committed (commit)
   # or posted in a PR (pull_request)
-  APPLY_FIXES_MODE: commit
+  APPLY_FIXES_MODE: pull_request
 
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
@@ -112,7 +115,7 @@ jobs:
       # Create pull request if applicable
       # (for now works only on PR from same repository, not from forks)
       - name: Create Pull Request with applied fixes
-        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c
+        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0
         id: cpr
         if: >-
           steps.ml.outputs.has_updated_sources == 1 &&
@@ -168,7 +171,7 @@ jobs:
         run: sudo chown -Rc $UID .git/
 
       - name: Commit and push applied linter fixes
-        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403
+        uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9
         if: >-
           steps.ml.outputs.has_updated_sources == 1 &&
           (
