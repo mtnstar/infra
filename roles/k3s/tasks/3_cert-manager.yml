@@ -1,6 +1,13 @@
 ---
 - name: only when k3s master
   block:
+    - name: Install Kubernetes Python library
+      pip:
+        name: kubernetes
+        state: present
+        executable: pip3
+        extra_args: --break-system-packages
+
     - name: Create cert-manager namespace
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig }}"

@@ -5,13 +5,6 @@
       set_fact:
         argocd_version: "stable"
 
-    - name: Install Kubernetes Python library
-      pip:
-        name: kubernetes
-        state: present
-        executable: pip3
-        extra_args: --break-system-packages
-
     - name: Create argocd namespace
       kubernetes.core.k8s:
         name: argocd
