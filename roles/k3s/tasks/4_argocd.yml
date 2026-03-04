@@ -1,91 +1,91 @@
 ---
 - name: only when k3s master
   block:
-  - name: set argocd version
-    set_fact:
-      argocd_version: "stable"
+    - name: set argocd version
+      set_fact:
+        argocd_version: "stable"
 
-  - name: Install Kubernetes Python library
-    pip:
-      name: kubernetes
-      state: present
-      executable: pip3
-      extra_args: --break-system-packages
+    - name: Install Kubernetes Python library
+      pip:
+        name: kubernetes
+        state: present
+        executable: pip3
+        extra_args: --break-system-packages
 
-  - name: Create argocd namespace
-    kubernetes.core.k8s:
-      name: argocd
-      api_version: v1
-      kind:  Namespace
-      kubeconfig: "{{ kubeconfig }}"
-      state: present
+    - name: Create argocd namespace
+      kubernetes.core.k8s:
+        name: argocd
+        api_version: v1
+        kind:  Namespace
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
 
-  - name: Deploy ArgoCD
-    kubernetes.core.k8s:
-      state: present
-      namespace: argocd
-      kubeconfig: "{{ kubeconfig }}"
-      src: "https://raw.githubusercontent.com/argoproj/argo-cd/{{ argocd_version }}/manifests/install.yaml"
+    - name: Deploy ArgoCD
+      kubernetes.core.k8s:
+        state: present
+        namespace: argocd
+        kubeconfig: "{{ kubeconfig }}"
+        src: "https://raw.githubusercontent.com/argoproj/argo-cd/{{ argocd_version }}/manifests/install.yaml"
 
-  - name: Wait for ArgoCD server deployment to exist
-    kubernetes.core.k8s_info:
-      kind:  Deployment
-      namespace: argocd
-      name: argocd-server
-      kubeconfig: "{{ kubeconfig }}"
-      wait: yes
-      wait_timeout: 300
+    - name: Wait for ArgoCD server deployment to exist
+      kubernetes.core.k8s_info:
+        kind:  Deployment
+        namespace: argocd
+        name: argocd-server
+        kubeconfig: "{{ kubeconfig }}"
+        wait: yes
+        wait_timeout: 300
 
-  - name: Get ArgoCD initial admin password
-    kubernetes.core.k8s_info:
-      kind: Secret
-      namespace: argocd
-      name: argocd-initial-admin-secret
-      kubeconfig: "{{ kubeconfig }}"
-    register: argocd_secret
+    - name: Get ArgoCD initial admin password
+      kubernetes.core.k8s_info:
+        kind: Secret
+        namespace: argocd
+        name: argocd-initial-admin-secret
+        kubeconfig: "{{ kubeconfig }}"
+      register: argocd_secret
 
-  - name:  Display ArgoCD admin password
-    debug:
-      msg: "ArgoCD admin password: {{ argocd_secret.resources[0].data.password | b64decode }}"
-    when: argocd_secret. resources | length > 0
+    - name:  Display ArgoCD admin password
+      debug:
+        msg: "ArgoCD admin password: {{ argocd_secret.resources[0].data.password | b64decode }}"
+      when: argocd_secret. resources | length > 0
 
-  #- name: Get internal-ca secret from cert-manager namespace
-    #kubernetes.core.k8s_info:
-      #kubeconfig: "{{ kubeconfig }}"
-      #kind: Secret
-      #name: internal-ca
-      #namespace: cert-manager
-    #register: internal_ca_secret
-
-  #- name: Copy internal-ca secret to argocd namespace
-    #kubernetes.core.k8s:
-      #kubeconfig: "{{ kubeconfig }}"
-      #state: present
-      #definition:
-        #apiVersion: v1
+    #- name: Get internal-ca secret from cert-manager namespace
+      #kubernetes.core.k8s_info:
+        #kubeconfig: "{{ kubeconfig }}"
         #kind: Secret
-        #metadata:
-          #name: internal-ca
-          #namespace: argocd
-        #type: "{{ internal_ca_secret.resources[0].type }}"
-        #data: "{{ internal_ca_secret.resources[0].data }}"
-    #when: internal_ca_secret.resources | length > 0
+        #name: internal-ca
+        #namespace: cert-manager
+      #register: internal_ca_secret
 
-  #- name: Create ArgoCD SSL cert
-    #kubernetes.core.k8s:
-      #kubeconfig: "{{ kubeconfig }}"
-      #state: present
-      #definition: "{{ lookup('file', 'argocd-internal-cert.yml') }}"
+    #- name: Copy internal-ca secret to argocd namespace
+      #kubernetes.core.k8s:
+        #kubeconfig: "{{ kubeconfig }}"
+        #state: present
+        #definition:
+          #apiVersion: v1
+          #kind: Secret
+          #metadata:
+            #name: internal-ca
+            #namespace: argocd
+          #type: "{{ internal_ca_secret.resources[0].type }}"
+          #data: "{{ internal_ca_secret.resources[0].data }}"
+      #when: internal_ca_secret.resources | length > 0
 
-  - name: Create ArgoCD Traefik internal servers transport
-    kubernetes.core.k8s:
-      kubeconfig:  "{{ kubeconfig }}"
-      state: present
-      definition: "{{ lookup('file', 'argocd-traefik-internal-servers-transport.yml') }}"
+    #- name: Create ArgoCD SSL cert
+      #kubernetes.core.k8s:
+        #kubeconfig: "{{ kubeconfig }}"
+        #state: present
+        #definition: "{{ lookup('file', 'argocd-internal-cert.yml') }}"
 
-  - name: Create ArgoCD Ingress
-    kubernetes.core.k8s:
-      kubeconfig:  "{{ kubeconfig }}"
-      state: present
-      definition: "{{ lookup('template', 'argocd-ingress.yml.j2') }}"
+    - name: Create ArgoCD Traefik internal servers transport
+      kubernetes.core.k8s:
+        kubeconfig:  "{{ kubeconfig }}"
+        state: present
+        definition: "{{ lookup('file', 'argocd-traefik-internal-servers-transport.yml') }}"
+
+    - name: Create ArgoCD Ingress
+      kubernetes.core.k8s:
+        kubeconfig:  "{{ kubeconfig }}"
+        state: present
+        definition: "{{ lookup('template', 'argocd-ingress.yml.j2') }}"
   when: inventory_hostname == 'k3s-1'
