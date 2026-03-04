@@ -25,5 +25,5 @@ SHOW_ELAPSED_TIME: true
 
 PYTHON_BANDIT_FILTER_REGEX_EXCLUDE: ^molecule?/
 
-EXCLUDED_DIRECTORIES:
-  - .git # config is created during megalinter ci run and king fisher complains about credential in there
+# config is created during megalinter ci run and king fisher complains about credential in there
+REPOSITORY_KINGFISHER_ARGUMENTS: "--exclude .git/"
