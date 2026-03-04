@@ -8,14 +8,12 @@
         api_version: v1
         kind: Namespace
         state: present
-      when: inventory_hostname == 'k3s-1'
 
     - name: Add cert-manager CRDs
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig }}"
         state: present
         src: "https://github.com/cert-manager/cert-manager/releases/download/{{ cert_manager_version }}/cert-manager.crds.yaml"
-      when: inventory_hostname == 'k3s-1'
 
     - name: Install cert-manager using kubectl
       shell: |
@@ -113,4 +111,21 @@
           spec:
             ca:
               secretName: "internal-ca"
+
+  rescue:
+    - name: cert-manager install failed on k3s master
+      debug:
+        msg:
+          - "cert-manager block failed on host {{ inventory_hostname }}."
+          - "Review earlier task output for the root cause."
+
+    - name: Fail explicitly after cert-manager error
+      fail:
+        msg: "cert-manager installation/configuration failed on {{ inventory_hostname }}."
+
+  always:
+    - name: cert-manager block finished (success or failure)
+      debug:
+        msg: "cert-manager block finished on {{ inventory_hostname }}."
+
   when: inventory_hostname == 'k3s-1'

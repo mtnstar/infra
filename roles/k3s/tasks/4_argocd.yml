@@ -16,7 +16,7 @@
       kubernetes.core.k8s:
         name: argocd
         api_version: v1
-        kind:  Namespace
+        kind: Namespace
         kubeconfig: "{{ kubeconfig }}"
         state: present
 
@@ -29,7 +29,7 @@
 
     - name: Wait for ArgoCD server deployment to exist
       kubernetes.core.k8s_info:
-        kind:  Deployment
+        kind: Deployment
         namespace: argocd
         name: argocd-server
         kubeconfig: "{{ kubeconfig }}"
@@ -44,48 +44,32 @@
         kubeconfig: "{{ kubeconfig }}"
       register: argocd_secret
 
-    - name:  Display ArgoCD admin password
+    - name: Display ArgoCD admin password
       debug:
         msg: "ArgoCD admin password: {{ argocd_secret.resources[0].data.password | b64decode }}"
-      when: argocd_secret. resources | length > 0
-
-    #- name: Get internal-ca secret from cert-manager namespace
-      #kubernetes.core.k8s_info:
-        #kubeconfig: "{{ kubeconfig }}"
-        #kind: Secret
-        #name: internal-ca
-        #namespace: cert-manager
-      #register: internal_ca_secret
-
-    #- name: Copy internal-ca secret to argocd namespace
-      #kubernetes.core.k8s:
-        #kubeconfig: "{{ kubeconfig }}"
-        #state: present
-        #definition:
-          #apiVersion: v1
-          #kind: Secret
-          #metadata:
-            #name: internal-ca
-            #namespace: argocd
-          #type: "{{ internal_ca_secret.resources[0].type }}"
-          #data: "{{ internal_ca_secret.resources[0].data }}"
-      #when: internal_ca_secret.resources | length > 0
-
-    #- name: Create ArgoCD SSL cert
-      #kubernetes.core.k8s:
-        #kubeconfig: "{{ kubeconfig }}"
-        #state: present
-        #definition: "{{ lookup('file', 'argocd-internal-cert.yml') }}"
+      when: argocd_secret.resources | length > 0
 
     - name: Create ArgoCD Traefik internal servers transport
       kubernetes.core.k8s:
-        kubeconfig:  "{{ kubeconfig }}"
+        kubeconfig: "{{ kubeconfig }}"
         state: present
         definition: "{{ lookup('file', 'argocd-traefik-internal-servers-transport.yml') }}"
 
     - name: Create ArgoCD Ingress
       kubernetes.core.k8s:
-        kubeconfig:  "{{ kubeconfig }}"
+        kubeconfig: "{{ kubeconfig }}"
         state: present
         definition: "{{ lookup('template', 'argocd-ingress.yml.j2') }}"
+
+  rescue:
+    - name: ArgoCD install failed on k3s master
+      debug:
+        msg:
+          - "ArgoCD install block failed on host {{ inventory_hostname }}."
+          - "Review earlier task output for the root cause."
+
+    - name: Fail explicitly after ArgoCD install error
+      fail:
+        msg: "ArgoCD installation/configuration failed on {{ inventory_hostname }}."
+
   when: inventory_hostname == 'k3s-1'
