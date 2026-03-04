@@ -61,8 +61,8 @@ jobs:
       - name: MegaLinter
 
         # You can override MegaLinter flavor used to have faster performances
-        # More info at https://megalinter.io/latest/flavors/
-        uses: ghcr.io/oxsecurity/megalinter:v9.4.0
+        # More info at https://megalinter.io/latestapt/flavors/
+        uses: oxsecurity/megalinter@8fbdead70d1409964ab3d5afa885e18ee85388bb
 
         id: ml
 
