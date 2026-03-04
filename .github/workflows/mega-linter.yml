@@ -19,6 +19,8 @@ permissions:
 
 # Comment env block if you do not want to apply fixes
 env:
+  MEGALINTER_FLAVOR: terraform
+
   # Apply linter fixes configuration
   #
   # When active, APPLY_FIXES must also be defined as environment variable
