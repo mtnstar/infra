@@ -3,4 +3,4 @@
    copy:
      src: k3s-helpers.bash_source
      dest: /etc/profile.d/k3s-helpers.sh
-     mode: '0755'
+     mode: '0644'
