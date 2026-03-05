@@ -7,3 +7,4 @@ roles/linux_bootstrap/tasks/main.yml
 roles/linux_router/tasks/main.yml
 roles/netplan/tasks/main.yml
 roles/pihole/tasks/main.yml
+roles/postgresql/tasks/main.yml

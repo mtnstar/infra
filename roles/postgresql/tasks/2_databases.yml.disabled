@@ -1,0 +1,89 @@
+---
+- name: Create PostgreSQL users
+  community.postgresql.postgresql_user:
+    name: "{{ user.name }}"
+    password: "{{ user.password }}"
+    role_attr_flags: "{{ user.role_attr_flags | default(omit) }}"
+    state: "{{ user.state | default('present') }}"
+    expires: "{{ user.expires | default(omit) }}"
+    conn_limit: "{{ user.conn_limit | default(omit) }}"
+    login_unix_socket: /var/run/postgresql
+  loop: "{{ postgres_users }}"
+  loop_control:
+    loop_var: user
+    label: "{{ user.name }}"
+  become: true
+  become_user: postgres
+  no_log: true  # Don't log passwords
+  when: postgres_users is defined
+
+- name: Create PostgreSQL databases
+  community.postgresql.postgresql_db:
+    name: "{{ database.name }}"
+    owner: "{{ database.owner | default(omit) }}"
+    encoding: "{{ database.encoding | default('UTF8') }}"
+    lc_collate: "{{ database.lc_collate | default('en_US.UTF-8') }}"
+    lc_ctype: "{{ database.lc_ctype | default('en_US.UTF-8') }}"
+    template: "{{ database.template | default('template0') }}"
+    state: "{{ database.state | default('present') }}"
+    login_unix_socket: /var/run/postgresql
+  loop: "{{ postgres_databases }}"
+  loop_control:
+    loop_var: database
+    label: "{{ database.name }}"
+  become: true
+  become_user: postgres
+  when: postgres_databases is defined
+
+- name: Grant database privileges to users
+  community.postgresql.postgresql_privs:
+    database: "{{ privilege.database }}"
+    roles: "{{ privilege.user }}"
+    type: "{{ privilege.type | default('database') }}"
+    privs: "{{ privilege.privs }}"
+    objs: "{{ privilege.objs | default(omit) }}"
+    schema: "{{ privilege.schema | default(omit) }}"
+    state: "{{ privilege.state | default('present') }}"
+    login_unix_socket: /var/run/postgresql
+  loop: "{{ postgres_privileges }}"
+  loop_control:
+    loop_var: privilege
+    label: "{{ privilege.database }} - {{ privilege.user }}"
+  become: true
+  become_user: postgres
+  when: postgres_privileges is defined
+
+- name: Grant schema privileges to users
+  community.postgresql.postgresql_privs:
+    database: "{{ schema_priv.database }}"
+    roles: "{{ schema_priv.user }}"
+    type: schema
+    objs: "{{ schema_priv.schema }}"
+    privs: "{{ schema_priv.privs }}"
+    state: "{{ schema_priv.state | default('present') }}"
+    login_unix_socket: /var/run/postgresql
+  loop: "{{ postgres_schema_privileges }}"
+  loop_control:
+    loop_var: schema_priv
+    label: "{{ schema_priv.database }} - {{ schema_priv.schema }} - {{ schema_priv.user }}"
+  become: true
+  become_user: postgres
+  when: postgres_schema_privileges is defined
+
+- name: Set default privileges for future tables
+  community.postgresql.postgresql_privs:
+    database: "{{ default_priv.database }}"
+    roles: "{{ default_priv.user }}"
+    objs: TABLES
+    privs: "{{ default_priv.privs }}"
+    type: default_privs
+    schema: "{{ default_priv.schema | default('public') }}"
+    state: "{{ default_priv.state | default('present') }}"
+    login_unix_socket: /var/run/postgresql
+  loop: "{{ postgres_default_privileges }}"
+  loop_control:
+    loop_var: default_priv
+    label: "{{ default_priv.database }} - {{ default_priv.user }}"
+  become: true
+  become_user: postgres
+  when: postgres_default_privileges is defined
