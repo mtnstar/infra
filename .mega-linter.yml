@@ -29,4 +29,4 @@ PYTHON_BANDIT_FILTER_REGEX_EXCLUDE: ^molecule?/
 REPOSITORY_KINGFISHER_ARGUMENTS: "--exclude .git/"
 
 # ignore symlinked tasks/main.yml by prettier
-YAML_PRETTIER_FILTER_REGEX_EXCLUDE: '(^|/)(roles/(docker-compose|dyndns_client|k3s|linux_base|linux_bootstrap|linux_router|netplan|pihole|postgresql)/tasks/main\.yml)$'
+YAML_PRETTIER_FILTER_REGEX_EXCLUDE: '(^|/)(roles/(docker-compose|dyndns_client|k3s|linux_base|linux_bootstrap|linux_router|netplan|pihole|postgresql|ufw)/tasks/main\.yml)$'

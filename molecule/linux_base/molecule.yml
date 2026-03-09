@@ -24,5 +24,3 @@ provisioner:
             infra_admin_password_hash: "$$6$$ro9AkmNC.NW/KyC9$$sGlcqEcnu4y2dQB179R0t6IREfrj3GWSCBRIhckdwPqWYZ1YU1wAhLQnRgaRhCZ8FIIxQh5TuoBvPHl/j4D/j0"
             timezone: "Europe/Zurich"
             disable_ipv6: false # not working in docker test container
-            ufw_enabled: false # not working in docker test container
-            ufw_reset: false # not working in docker test container

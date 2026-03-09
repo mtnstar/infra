@@ -1,0 +1,5 @@
+- name: Apply ufw firewall config and rules
+  hosts: all
+  become: true
+  roles:
+    - role: ufw
