@@ -1,0 +1,5 @@
+- name: Apply netplan configuration
+  hosts: all
+  become: true
+  roles:
+    - role: netplan
