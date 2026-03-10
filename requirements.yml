@@ -1,4 +1,5 @@
 collections:
   - name: kubernetes.core
   - name: community.docker
-roles: []
+roles:
+  - name: PowerDNS.pdns

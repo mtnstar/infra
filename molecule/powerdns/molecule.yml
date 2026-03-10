@@ -1,0 +1,43 @@
+---
+driver:
+  name: podman
+platforms:
+  - name: instance
+    image: ghcr.io/mtnstar/infra-test-ubuntu:24.04
+    pre_build_image: true
+verifier:
+  name: testinfra
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_ROLES_PATH: "../../.galaxy/roles:../../roles"
+  inventory:
+    hosts:
+      all:
+        hosts:
+          instance:
+            ansible_user: test-admin
+            bootstrap_user: test-bootstrap
+            timezone: "Europe/Zurich"
+            secure_lan_cidr: "127.0.0.1/32"
+            pdns_zone_name: example.local
+            pdns_zone_admin: hostmaster.example.local
+
+            pdns_records_manual:
+              - name: pihole
+                zone: example.local
+                type: CNAME
+                content: "stargate.example.local"
+                ttl: 3600
+
+            pdns_database_name: /var/lib/powerdns/pdns.sqlite3
+            pdns_config:
+              primary: true
+              secondary: false
+              local-address: 0.0.0.0
+              local-port: 5300
+            pdns_backends:
+              gsqlite3:
+                database: "{{ pdns_database_name }}"
+            pdns_sqlite_databases_locations:
+              - "{{ pdns_database_name }}"

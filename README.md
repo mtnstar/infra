@@ -19,6 +19,7 @@ directory structure:
 
 - start mtn-shell (see github.com/mtnstar/mtn-shell)
 - clone this repository
+- `ansible-galaxy role install -r requirements.yml -p ./.galaxy/roles`
 - copy default inventory directory and customize it (e.g. ./inventories/default -> ./inventories/production)
 - add desired public ssh keys to `inventories/production/ssh_keys/*.pub`
 
