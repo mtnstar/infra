@@ -1,2 +1,3 @@
 ---
 pdns_auto_inventory_records: true
+pdns_records_from_hosts: []

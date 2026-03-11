@@ -1,0 +1,98 @@
+---
+- name: Build DNS records from inventory hosts
+  set_fact:
+    pdns_records_from_hosts: |
+      {% set records = [] %}
+      {% for host in groups['all'] %}
+      {% if hostvars[host].ansible_facts is defined and hostvars[host].ansible_facts.default_ipv4 is defined %}
+      {% set _ = records.append({
+          'name': host,
+          'zone': pdns_zone_name,
+          'type': 'A',
+          'content': hostvars[host].ansible_facts.default_ipv4.address,
+          'ttl': 3600
+      }) %}
+      {% endif %}
+      {% endfor %}
+      {{ records }}
+  when: pdns_auto_inventory_records | bool
+
+- name: Display host records
+  debug:
+    msg: "{{ pdns_records_from_hosts}}"
+
+- name: Combine manual and inventory DNS records
+  set_fact:
+    pdns_records_combined: "{{ pdns_records_manual + pdns_records_from_hosts }}"
+
+- name: Display DNS records to be created
+  debug:
+    msg: "Will create {{ pdns_records_combined | length }} DNS records"
+
+- name: Check if zone exists
+  command: pdns_control list-zones
+  register: existing_zones
+  changed_when: false
+  failed_when: false
+
+- name: Create PowerDNS zone
+  command: pdnsutil create-zone {{ pdns_zone_name }}
+  when: pdns_zone_name not in existing_zones.stdout
+  register: zone_created
+
+- name: Add SOA record to zone
+  command: >
+    pdnsutil add-record {{ pdns_zone_name }} @ SOA 
+    "ns1.{{ pdns_zone_name }}. {{ pdns_zone_admin }}. 1 10800 3600 604800 3600"
+  when: zone_created is changed
+
+- name: Add NS record to zone
+  command: pdnsutil add-record {{ pdns_zone_name }} @ NS ns1.{{ pdns_zone_name }}.
+  when: zone_created is changed
+
+- name: Add A record for nameserver
+  command: pdnsutil add-record {{ pdns_zone_name }} ns1 A {{ ansible_facts.default_ipv4.address }}
+  when: zone_created is changed
+
+- name: Get existing records in zone
+  shell: pdnsutil list-zone {{ pdns_zone_name }} | awk '{print $1}'
+  register: existing_records
+  changed_when: false
+  failed_when: false
+
+- name: Display existing DNS records
+  debug:
+    msg: "Existing records: {{ existing_records.stdout_lines }}"
+
+- name: debug
+  debug:
+    msg:
+      - "Looking for: '{{ record.name }}.{{ pdns_zone_name }}.'"
+      - "Looking for (no dot): '{{ record.name }}.{{ pdns_zone_name }}'"
+      - "Existing records as lines: {{ existing_records.stdout_lines }}"
+      - "Match check: {{ (record.name ~ '.' ~ pdns_zone_name) in existing_records.stdout_lines }}"
+  loop: "{{ pdns_records_combined }}"
+  loop_control:
+    loop_var: record
+    label: "{{ record.name }}.{{ pdns_zone_name }} ({{ record.type }}) -> {{ record.content }}"
+
+- name: Add DNS records to PowerDNS zone
+  command: >
+    pdnsutil add-record {{ pdns_zone_name }} {{ record.name }} {{ record.type }} {{ record.ttl | default(3600) }} {{ record.content }} 
+  loop: "{{ pdns_records_combined }}"
+  loop_control:
+    loop_var: record
+    label: "{{ record.name }}.{{ pdns_zone_name }} ({{ record.type }}) -> {{ record.content }}"
+  when:
+    - pdns_records_combined is defined
+    - pdns_records_combined | length > 0
+    - (record.name ~ '.' ~ pdns_zone_name) not in existing_records.stdout_lines
+  register: record_creation
+
+#- name: Rectify zone to fix DNSSEC and metadata
+  #command: pdnsutil rectify-zone {{ pdns_zone_name }}
+  #when: zone_created is changed or (record_creation is defined and record_creation.changed)
+
+- name: Increase SOA serial after changes
+  command: pdnsutil increase-serial {{ pdns_zone_name }}
+  when: record_creation is defined and record_creation.changed

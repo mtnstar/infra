@@ -1,36 +1,11 @@
 ---
-- name: Build DNS records from inventory hosts
-  set_fact:
-    pdns_records_from_hosts: |
-      {% set records = [] %}
-      {% for host in groups['all'] %}
-      {% if hostvars[host].ansible_facts is defined and hostvars[host].ansible_facts.default_ipv4 is defined %}
-      {% set _ = records.append({
-          'name': host,
-          'zone': pdns_zone_name,
-          'type': 'A',
-          'content': hostvars[host].ansible_facts.default_ipv4.address,
-          'ttl': 3600
-      }) %}
-      {% endif %}
-      {% endfor %}
-      {{ records }}
-  when: pdns_auto_inventory_records | bool
-
-- name: Set empty inventory records if auto-creation disabled
-  set_fact:
-    pdns_records_from_hosts: []
-  when: not (pdns_auto_inventory_records | bool)
-
-- name: Combine manual and inventory DNS records
-  set_fact:
-    pdns_records_combined: "{{ pdns_records_manual + pdns_records_from_hosts }}"
-
-- name: Display DNS records to be created
-  debug:
-    msg: "Will create {{ pdns_records_combined | length }} DNS records"
-    verbosity: 1
-
-- name: Include PowerDNS.pdns role with variables
+- name: Include PowerDNS.pdns role
   include_role:
     name: PowerDNS.pdns
+
+- name: Wait for PowerDNS service to be ready
+  wait_for:
+    port: "{{ pdns_port | default(5300) }}"
+    host: 127.0.0.1
+    timeout: 30
+    delay: 2
