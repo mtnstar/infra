@@ -40,59 +40,17 @@
   when: pdns_zone_name not in existing_zones.stdout
   register: zone_created
 
-- name: Add SOA record to zone
-  command: >
-    pdnsutil add-record {{ pdns_zone_name }} @ SOA 
-    "ns1.{{ pdns_zone_name }}. {{ pdns_zone_admin }}. 1 10800 3600 604800 3600"
-  when: zone_created is changed
+- name: Generate zone file from template
+  template:
+    src: zone.j2
+    dest: "/tmp/{{ pdns_zone_name }}.zone"
+  register: zone_file
 
-- name: Add NS record to zone
-  command: pdnsutil add-record {{ pdns_zone_name }} @ NS ns1.{{ pdns_zone_name }}.
-  when: zone_created is changed
+- name: Replace PowerDNS zone
+  command: pdnsutil load-zone {{ pdns_zone_name }} /tmp/{{ pdns_zone_name }}.zone
+  when: zone_file is changed
+  notify: restart pdns
 
-- name: Add A record for nameserver
-  command: pdnsutil add-record {{ pdns_zone_name }} ns1 A {{ ansible_facts.default_ipv4.address }}
-  when: zone_created is changed
-
-- name: Get existing records in zone
-  shell: pdnsutil list-zone {{ pdns_zone_name }} | awk '{print $1}'
-  register: existing_records
-  changed_when: false
-  failed_when: false
-
-- name: Display existing DNS records
-  debug:
-    msg: "Existing records: {{ existing_records.stdout_lines }}"
-
-- name: debug
-  debug:
-    msg:
-      - "Looking for: '{{ record.name }}.{{ pdns_zone_name }}.'"
-      - "Looking for (no dot): '{{ record.name }}.{{ pdns_zone_name }}'"
-      - "Existing records as lines: {{ existing_records.stdout_lines }}"
-      - "Match check: {{ (record.name ~ '.' ~ pdns_zone_name) in existing_records.stdout_lines }}"
-  loop: "{{ pdns_records_combined }}"
-  loop_control:
-    loop_var: record
-    label: "{{ record.name }}.{{ pdns_zone_name }} ({{ record.type }}) -> {{ record.content }}"
-
-- name: Add DNS records to PowerDNS zone
-  command: >
-    pdnsutil add-record {{ pdns_zone_name }} {{ record.name }} {{ record.type }} {{ record.ttl | default(3600) }} {{ record.content }} 
-  loop: "{{ pdns_records_combined }}"
-  loop_control:
-    loop_var: record
-    label: "{{ record.name }}.{{ pdns_zone_name }} ({{ record.type }}) -> {{ record.content }}"
-  when:
-    - pdns_records_combined is defined
-    - pdns_records_combined | length > 0
-    - (record.name ~ '.' ~ pdns_zone_name) not in existing_records.stdout_lines
-  register: record_creation
-
-#- name: Rectify zone to fix DNSSEC and metadata
-  #command: pdnsutil rectify-zone {{ pdns_zone_name }}
-  #when: zone_created is changed or (record_creation is defined and record_creation.changed)
-
-- name: Increase SOA serial after changes
+- name: Increase zone serial and notify slaves
   command: pdnsutil increase-serial {{ pdns_zone_name }}
-  when: record_creation is defined and record_creation.changed
+  when: zone_file is changed

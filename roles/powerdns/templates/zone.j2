@@ -1,0 +1,37 @@
+$ORIGIN {{ pdns_zone_name }}.
+
+; SOA Record
+{{ pdns_zone_name }}. {{ pdns_default_ttl | default(3600) }} IN SOA {{ pdns_primary_ns }}. {{ pdns_admin_email | default('admin.' ~ pdns_zone_name ~ '.') }} (
+    {{ ansible_date_time.epoch }}
+    10800
+    3600
+    604800
+    3600 )
+
+; NS Record
+{{ pdns_zone_name }}. {{ pdns_default_ttl | default(3600) }} IN NS {{ pdns_primary_ns }}.
+
+; A Records
+{% for record in pdns_records_combined | selectattr('type', 'equalto', 'A') %}
+{{ record.name }}.{{ pdns_zone_name }}. {{ record.ttl | default(3600) }} IN A {{ record.content }}
+{% endfor %}
+
+; AAAA Records
+{% for record in pdns_records_combined | selectattr('type', 'equalto', 'AAAA') %}
+{{ record.name }}.{{ pdns_zone_name }}. {{ record.ttl | default(3600) }} IN AAAA {{ record.content }}
+{% endfor %}
+
+; CNAME Records
+{% for record in pdns_records_combined | selectattr('type', 'equalto', 'CNAME') %}
+{{ record.name }}.{{ pdns_zone_name }}. {{ record.ttl | default(3600) }} IN CNAME {{ record.content }}.
+{% endfor %}
+
+; MX Records
+{% for record in pdns_records_combined | selectattr('type', 'equalto', 'MX') %}
+{{ record.name }}.{{ pdns_zone_name }}. {{ record.ttl | default(3600) }} IN MX {{ record.priority | default(10) }} {{ record.content }}.
+{% endfor %}
+
+; TXT Records
+{% for record in pdns_records_combined | selectattr('type', 'equalto', 'TXT') %}
+{{ record.name }}.{{ pdns_zone_name }}. {{ record.ttl | default(3600) }} IN TXT "{{ record.content }}"
+{% endfor %}

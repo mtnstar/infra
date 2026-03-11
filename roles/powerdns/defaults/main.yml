@@ -1,3 +1,4 @@
 ---
 pdns_auto_inventory_records: true
 pdns_records_from_hosts: []
+pdns_primary_ns: "ns1.{{ pdns_zone_name }}"
