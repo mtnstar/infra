@@ -1,0 +1,22 @@
+---
+pdns_zone_name: example.local
+pdns_zone_admin: admin.example.local
+
+pdns_records_manual:
+  - name: pihole
+    zone: example.local
+    type: CNAME
+    content: "stargate.example.local"
+    ttl: 3600
+
+pdns_database_name: /var/lib/powerdns/pdns.sqlite3
+pdns_config:
+  primary: true
+  secondary: false
+  local-address: 0.0.0.0
+  local-port: 5300
+pdns_backends:
+  gsqlite3:
+    database: "{{ pdns_database_name }}"
+pdns_sqlite_databases_locations:
+  - "{{ pdns_database_name }}"
