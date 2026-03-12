@@ -4,12 +4,13 @@
     pdns_records_from_hosts: |
       {% set records = [] %}
       {% for host in groups['all'] %}
-      {% if hostvars[host].ansible_facts is defined and hostvars[host].ansible_facts.default_ipv4 is defined %}
+      {% set host_ip = hostvars[host].ansible_host | default(hostvars[host].get('ip_address', None)) %}
+      {% if host_ip %}
       {% set _ = records.append({
           'name': host,
           'zone': pdns_zone_name,
           'type': 'A',
-          'content': hostvars[host].ansible_facts.default_ipv4.address,
+          'content': host_ip,
           'ttl': 3600
       }) %}
       {% endif %}
