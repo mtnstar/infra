@@ -1399,7 +1399,7 @@
   #
   # Allowed values are:
   #     Array of valid dnsmasq config line options
-  dnsmasq_lines = []
+  dnsmasq_lines = [ "server=/{{ local_zone_name }}/127.0.0.1#5300"]
 
   # Log additional information about queries and replies to pihole.log
   #
