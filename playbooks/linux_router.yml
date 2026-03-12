@@ -1,9 +1,9 @@
+---
 - name: Apply linux router configuration
   hosts: linux_routers
   become: true
   roles:
     - netplan
     - linux_router
-    - docker-compose
     - pihole
-    - wireguard
+    #- wireguard

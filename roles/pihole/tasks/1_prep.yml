@@ -1,0 +1,42 @@
+---
+- name: Create pihole group
+  ansible.builtin.group:
+    name: pihole
+    gid: 953
+    state: present
+    force: true
+
+- name: Create pihole user
+  ansible.builtin.user:
+    name: pihole
+    uid: 953
+    home: "/home/pihole"
+    shell: "/usr/sbin/nologin"
+    group: pihole
+    password: "*"
+    state: present
+    force: true
+
+- name: Create config directory
+  ansible.builtin.file:
+    state: directory
+    path: /etc/pihole
+    owner: pihole
+    group: pihole
+    mode: "770"
+
+- name: Create pihole web directory
+  ansible.builtin.file:
+    state: directory
+    path: /opt/pihole/web
+    owner: pihole
+    group: pihole
+    mode: "770"
+
+- name: Pre-configure pihole
+  ansible.builtin.template:
+    src: pihole.toml.j2
+    dest: /etc/pihole/pihole.toml
+    owner: pihole
+    group: pihole
+    mode: "640"

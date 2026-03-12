@@ -1,0 +1,6 @@
+---
+- name: Apply pihole role
+  hosts: linux_routers
+  become: true
+  roles:
+    - pihole
