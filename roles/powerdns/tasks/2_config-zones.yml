@@ -44,12 +44,18 @@
   template:
     src: zone.j2
     dest: "/tmp/{{ pdns_zone_name }}.zone"
+    mode: 600
   register: zone_file
 
 - name: Replace PowerDNS zone
   command: pdnsutil load-zone {{ pdns_zone_name }} /tmp/{{ pdns_zone_name }}.zone
   when: zone_file is changed
   notify: restart pdns
+
+- name: remove temporary zone file
+  file:
+    dest: "/tmp/{{ pdns_zone_name }}.zone"
+    state: absent
 
 - name: Increase zone serial and notify slaves
   command: pdnsutil increase-serial {{ pdns_zone_name }}
