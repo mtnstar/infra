@@ -16,6 +16,7 @@
     password: "*"
     state: present
     force: true
+  no_log: true
 
 - name: Create config directory
   ansible.builtin.file:
