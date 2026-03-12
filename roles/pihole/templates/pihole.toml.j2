@@ -14,7 +14,7 @@
   upstreams = [
     "{{ dns1 }}",
     "{{ dns2 }}",
-  ] default = []
+  ]
 
   # Use this option to control deep CNAME inspection. Disabling it might be beneficial
   # for very low-end devices
@@ -267,7 +267,6 @@
   #    
   #     - "<domain>": Domain used for the reverse server feature (e.g., "fritz.box")
   #     Example: "fritz.box"
-  revServers = []
 
   [dns.domain]
     # The DNS domain used by your Pi-hole.

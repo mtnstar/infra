@@ -23,15 +23,15 @@
     path: /etc/pihole
     owner: pihole
     group: pihole
-    mode: "770"
+    mode: "775"
 
 - name: Create pihole web directory
   ansible.builtin.file:
     state: directory
-    path: /opt/pihole/web
+    path: /opt/pihole/web/admin
     owner: pihole
     group: pihole
-    mode: "770"
+    mode: "775"
 
 - name: Pre-configure pihole
   ansible.builtin.template:

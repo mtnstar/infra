@@ -4,6 +4,17 @@
     cmd: curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
     creates: /etc/systemd/system/pihole-FTL.service
 
+- name: Check if source directory exists
+  ansible.builtin.stat:
+    path: /var/www/html/admin
+  register: src_web_admin_dir
+
+- name: Move directory if source exists and destination doesn't
+  ansible.builtin.command:
+    cmd: mv /var/www/html/admin /opt/pihole/web
+  when: 
+    - src_web_admin_dir.stat.exists
+
 - name: Configure Pi-hole admin password
   ansible.builtin.shell: |
     pihole setpassword "{{ pihole_password }}"
