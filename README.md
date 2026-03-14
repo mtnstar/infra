@@ -23,6 +23,17 @@ directory structure:
 - copy default inventory directory and customize it (e.g. ./inventories/default -> ./inventories/production)
 - add desired public ssh keys to `inventories/production/ssh_keys/*.pub`
 
+## Bootstrap a new ubuntu system
+
+after bootstrapping new ubuntu system with cloud-init:
+
+1. add new host to inventory (e.g. `inventories/production/hosts`)
+2. specify ansible_user and ansible_port if needed
+3. run `ansible-playbook -i inventories/production/hosts playbooks/linux_bootstrap.yml -l mynewhost`
+4. remove ansible_user in inventory hosts
+5. apply linux_base playbook to set up basic linux configuration and users: `ansible-playbook -i inventories/production/hosts playbooks/linux_base.yml -l mynewhost`
+6. remove ansible_port if you specified it in inventory hosts
+
 ## Dynamic Role Tasks
 
 for every role, the `tasks/main.yml` is symlinked from `roles/shared/tasks/dynamic_tasks_main.yml`. This enables us to split up role's tasks easely into seperate files which makes the code cleaner. It also makes it possible to only run a role's specific tasks by defining param tasks:
