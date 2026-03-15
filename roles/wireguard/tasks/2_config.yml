@@ -1,0 +1,48 @@
+---
+- name: Create WireGuard configuration directory
+  ansible.builtin.file:
+    path: /etc/wireguard
+    state: directory
+    mode: '0700'
+    owner: root
+    group: root
+
+- name: Generate WireGuard private key
+  ansible.builtin.shell: |
+    wg genkey
+  register: wireguard_private_key_generated
+  changed_when: false
+  when: wireguard_private_key is not defined
+  no_log: true
+
+- name: Set private key fact
+  ansible.builtin.set_fact:
+    wireguard_private_key: "{{ wireguard_private_key_generated.stdout }}"
+  when: wireguard_private_key is not defined
+  no_log: true
+
+- name: Generate WireGuard public key
+  ansible.builtin.shell: |
+    echo "{{ wireguard_private_key }}" | wg pubkey
+  register: wireguard_public_key_generated
+  changed_when: false
+  no_log: true
+
+- name: Display public key
+  ansible.builtin.debug:
+    msg: "WireGuard Public Key: {{ wireguard_public_key_generated.stdout }}"
+
+- name: Deploy WireGuard interface configuration
+  ansible.builtin.template:
+    src: wg-interface.conf.j2
+    dest: "/etc/wireguard/{{ wireguard_interface }}.conf"
+    mode: '0600'
+    owner: root
+    group: root
+  notify: Restart WireGuard
+
+- name: Enable and start WireGuard interface
+  ansible.builtin.systemd:
+    name: "wg-quick@{{ wireguard_interface }}"
+    enabled: true
+    state: started

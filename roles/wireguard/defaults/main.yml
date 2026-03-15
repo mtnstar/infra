@@ -1,0 +1,28 @@
+---
+wireguard_interface: wg0
+
+wireguard_address: "10.10.0.1/24"
+wireguard_port: 51820
+
+# Private key (leave undefined to auto-generate)
+# wireguard_private_key: ""
+
+# Peers configuration
+wireguard_peers: []
+# Example:
+# wireguard_peers:
+#   - name: "client1"
+#     public_key: "peer_public_key_here"
+#     allowed_ips: "10.10.0.2/32"
+#     endpoint: "peer.example.com:51820" # Optional
+#     persistent_keepalive: 25  # Optional
+
+# DNS servers (optional)
+wireguard_dns: []
+
+# MTU (optional)
+wireguard_mtu: ""
+
+# PostUp and PostDown commands (optional)
+wireguard_post_up: []
+wireguard_post_down: []
