@@ -28,6 +28,17 @@
     ansible.builtin.set_fact:
       wireguard_private_key: "{{ wireguard_private_key.stdout }}"
     no_log: true
+  rescue:
+    - name: there was an error extracting the private key
+      debug:
+        msg: "there was an error extracting wireguard private key in existing config on {{ inventory_hostname }}."
+    - name: Fail explicitly after extracting private key error
+      fail:
+        msg: "extracting wireguard private key failed on {{ inventory_hostname }}."
+  always:
+    - name: extract wireguard private key block finished (success or failure)
+      debug:
+        msg: "extracting wireguard private key block finished on {{ inventory_hostname }}."
 
 - name: When WireGuard config does not yet exist
   when: not wireguard_config_stat.stat.exists
@@ -43,6 +54,17 @@
     ansible.builtin.set_fact:
       wireguard_private_key: "{{ wireguard_private_key_generated.stdout }}"
     no_log: true
+  rescue:
+    - name: there was an error generating the private key
+      debug:
+        msg: "there was an error generating wireguard private key on {{ inventory_hostname }}."
+    - name: Fail explicitly after wireguard private key generation error
+      fail:
+        msg: "wireguard private key generation failed failed on {{ inventory_hostname }}."
+  always:
+    - name: generating wireguard private key block finished (success or failure)
+      debug:
+        msg: "generating wireguard private key block finished on {{ inventory_hostname }}."
 
 - name: Generate WireGuard public key
   ansible.builtin.shell: |
