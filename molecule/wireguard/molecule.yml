@@ -11,6 +11,8 @@ provisioner:
   name: ansible
   env:
     ANSIBLE_ROLES_PATH: "../../.galaxy/roles:../../roles"
+    ANSIBLE_INVENTORY_IGNORE_EXTENSIONS: ".conf,.key,.pem"
+    ANSIBLE_INVENTORY_IGNORE_PATTERNS: "wireguard_configs,wg*.conf*"
   inventory:
     hosts:
       all:
