@@ -1,4 +1,4 @@
-name: Molecule CI
+name: Molecule CI - Wireguard
 
 on:
   push:
