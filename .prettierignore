@@ -9,3 +9,5 @@ roles/netplan/tasks/main.yml
 roles/pihole/tasks/main.yml
 roles/postgresql/tasks/main.yml
 roles/ufw/tasks/main.yml
+roles/wireguard/tasks/main.yml
+roles/powerdns/tasks/main.yml
