@@ -37,7 +37,7 @@
 - name: Read k3s token from master
   delegate_to: k3s-1
   slurp:
-    src:  "{{ k3s_token_file }}"
+    src: "{{ k3s_token_file }}"
   register:  k3s_token
 
 - name: Store k3s token as fact
