@@ -7,40 +7,57 @@
     owner: root
     group: root
 
-- name: Read WireGuard config file
-  slurp:
-    src: /etc/wireguard/wg0.conf
-  register: wg_config
-
-- name: Extract private key from config
-  set_fact:
-    wireguard_private_key: "{{ (wg_config.content | b64decode | regex_search('PrivateKey = (.+)', '\\1')) | first }}"
-  when: wg_config is defined and wg_config.content is defined
-
-- name: Generate WireGuard private key
-  ansible.builtin.shell: |
-    wg genkey
-  register: wireguard_private_key_generated
-  changed_when: false
-  when: wireguard_private_key is not defined
-  no_log: true
-
-- name: Set private key fact
+- name: Set wg config file path
   ansible.builtin.set_fact:
-    wireguard_private_key: "{{ wireguard_private_key_generated.stdout }}"
-  when: wireguard_private_key is not defined
-  no_log: true
+    wireguard_config_path: "/etc/wireguard/{{ wireguard_interface }}.conf"
+
+- name: Check if WireGuard config exists
+  stat:
+    path: "{{ wireguard_config_path }}"
+  register: wireguard_config_stat
+
+- name: When WireGuard config exists, extract existing key
+  when: wireguard_config_stat.stat.exists
+  block:
+  - name: Extract WireGuard private key if present
+    shell: "grep '^PrivateKey' {{ wireguard_config_path }} | awk '{print $3}'"
+    register: wireguard_private_key
+    changed_when: false
+    when: wireguard_config_stat.stat.exists
+  - name: Set private key fact
+    ansible.builtin.set_fact:
+      wireguard_private_key: "{{ wireguard_private_key.stdout }}"
+    no_log: true
+
+- name: When WireGuard config does not yet exist
+  when: not wireguard_config_stat.stat.exists
+  block:
+  - name: Generate WireGuard private key
+    ansible.builtin.shell: |
+      wg genkey
+    register: wireguard_private_key_generated
+    changed_when: false
+    when: not wireguard_config_stat.stat.exists
+    no_log: true
+  - name: Set private key fact
+    ansible.builtin.set_fact:
+      wireguard_private_key: "{{ wireguard_private_key_generated.stdout }}"
+    no_log: true
 
 - name: Generate WireGuard public key
   ansible.builtin.shell: |
     echo "{{ wireguard_private_key }}" | wg pubkey
-  register: wireguard_public_key_generated
+  register: wireguard_public_key
   changed_when: false
   no_log: true
 
+- name: Set public key fact
+  ansible.builtin.set_fact:
+    wireguard_public_key: "{{ wireguard_public_key.stdout }}"
+
 - name: Display public key
   ansible.builtin.debug:
-    msg: "WireGuard Public Key: {{ wireguard_public_key_generated.stdout }}"
+    msg: "WireGuard Public Key: {{ wireguard_public_key }}"
 
 - name: Deploy WireGuard interface configuration
   ansible.builtin.template:
