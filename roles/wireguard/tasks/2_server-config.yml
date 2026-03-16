@@ -90,33 +90,6 @@
     group: root
   notify: Restart WireGuard
 
-- name: Fetch WireGuard config from remote host
-  fetch:
-    src: /etc/wireguard/wg0.conf
-    dest: "/tmp/wg0.conf"
-    flat: yes
-
-- name: Change ownership of fetched file
-  delegate_to: localhost
-  become: yes
-  file:
-    path: "/tmp/wg0.conf"
-    owner: "{{ infra_admin_username }}"
-    group: "{{ infra_admin_username }}"
-    mode: '0600'
-  run_once: true
-
-- name: Encrypt the fetched file with Ansible Vault
-  delegate_to: localhost
-  become: yes
-  become_user: "{{ infra_admin_username }}"
-  command: ansible-vault encrypt /tmp/wg0.conf --output "{{ inventory_dir }}/wireguard_configs/wg0.conf.vault"
-  environment:
-    PATH: "{{ lookup('env', 'PATH') }}"
-    ANSIBLE_VAULT_PASSWORD_FILE: "{{ lookup('env', 'ANSIBLE_VAULT_PASSWORD_FILE') }}"
-  ignore_errors: yes
-  run_once: true
-
 - name: Enable and start WireGuard interface
   ansible.builtin.systemd:
     name: "wg-quick@{{ wireguard_interface }}"
