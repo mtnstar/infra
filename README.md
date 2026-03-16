@@ -52,4 +52,4 @@ checkout `roles/linux_base/tasks/` for an example.
 
 inside mtn-shell in this repo run `molecule test -s linux_base`
 
-as test container ghcr.io/mtnstar/infra-test-ubuntu:24.04 is used. (see https://github.com/mtnstar/infra-test-ubuntu)
+see [Molecule Testing](molecule/README.md) for more details on how to run molecule tests.

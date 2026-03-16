@@ -11,14 +11,9 @@ provisioner:
   name: ansible
   env:
     ANSIBLE_ROLES_PATH: "../../.galaxy/roles:../../roles"
-    ANSIBLE_INVENTORY_IGNORE_EXTENSIONS: ".conf,.key,.pem"
-    ANSIBLE_INVENTORY_IGNORE_PATTERNS: "wireguard_configs,wg*.conf*"
+    ANSIBLE_VAULT_PASSWORD_FILE: "../.ansible_vault_pass.txt"
   inventory:
-    hosts:
-      all:
-        hosts:
-          instance:
-            #task_list: ["1_install", "2_server-config"] 
-            ansible_user: test-admin
-            bootstrap_user: test-bootstrap
-            timezone: "Europe/Zurich"
+    links:
+      group_vars: "../../inventories/test/group_vars/"
+      host_vars: "../../inventories/test/host_vars/"
+      hosts: "../../inventories/test/hosts"

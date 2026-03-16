@@ -1,6 +1,5 @@
 ---
 - name: Disable IPv6 via sysctl
-  become: true
   sysctl: 
     name: "{{ sysctl_param }}"
     value: "1"

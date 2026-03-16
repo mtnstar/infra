@@ -1,11 +1,12 @@
-infra_admin_username: "default-admin"
+infra_admin_username: "test-admin"
 # set vault variable in production
-# infra_admin_password_hash: "{{ vault_infra_admin_password_hash }}"
+infra_admin_password_hash: "{{ vault_infra_admin_password_hash }}"
 ansible_user: "{{ infra_admin_username }}"
 timezone: "Europe/Zurich"
 arch: "amd64"
 #motd_message_url: "https://infra-git.example.com" # Uncomment and set a custom MOTD message URL if needed
-bootstrap_user: "default-bootstrap"
+bootstrap_user: "test-bootstrap"
 #sshd_port: 22 # Uncomment and set a custom SSH port if needed
 dns1: 8.8.8.8
 dns2: 8.8.4.4
+disable_ipv6: false
