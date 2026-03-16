@@ -2,7 +2,7 @@
 driver:
   name: podman
 platforms:
-  - name: instance
+  - name: ubuntu-24.04
     image: ghcr.io/mtnstar/infra-test-ubuntu:24.04
     pre_build_image: true
 verifier:
@@ -11,7 +11,13 @@ provisioner:
   name: ansible
   env:
     ANSIBLE_ROLES_PATH: "../../.galaxy/roles:../../roles"
+    ANSIBLE_VAULT_PASSWORD_FILE: "../.ansible_vault_pass.txt"
   inventory:
+    # enable after moving pdns variables for testing to inventory
+    #links:
+      #group_vars: "../../inventories/test/group_vars/"
+      #host_vars: "../../inventories/test/host_vars/"
+      #hosts: "../../inventories/test/hosts"
     hosts:
       all:
         hosts:
