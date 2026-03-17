@@ -1,0 +1,22 @@
+---
+- name: Set local_user
+  ansible.builtin.set_fact:
+    local_user: "{{ lookup('env', 'USER') }}"
+
+- name: Set local_wireguard_config_dir
+  ansible.builtin.set_fact:
+    local_wireguard_config_dir: "{{ inventory_dir }}/wireguard_configs"
+
+- name: Set local_wireguard_client_config_dir
+  ansible.builtin.set_fact:
+    local_wireguard_client_config_dir: "{{ inventory_dir }}/wireguard_configs/clients"
+
+- name: Make sure client config directory exists for given inventory
+  delegate_to: localhost
+  ansible.builtin.file:
+    path: "{{ local_wireguard_client_config_dir }}"
+    state: directory
+    mode: "0700"
+    owner: "{{ local_user }}"
+    group: "{{ local_user }}"
+  changed_when: false

@@ -1,6 +1,6 @@
 [Interface]
 # {{ ansible_managed }}
-Address = {{ wireguard_address }}
+Address = {{ wireguard_internal_server_ip }}
 ListenPort = {{ wireguard_port }}
 PrivateKey = {{ wireguard_private_key }}
 
@@ -20,10 +20,10 @@ PostUp = {{ command }}
 PostDown = {{ command }}
 {% endfor %}
 
-{% for peer in wireguard_peers %}
+{% for peer in wireguard_client_peers %}
 
 [Peer]
-# Peer: {{ peer.name | default('Unnamed') }}
+# Peer: {{ peer.name }}
 PublicKey = {{ peer.public_key }}
 {% if peer.preshared_key is defined %}
 PresharedKey = {{ peer.preshared_key }}

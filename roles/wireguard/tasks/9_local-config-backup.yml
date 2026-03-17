@@ -1,9 +1,14 @@
 ---
-- set_fact:
+- name: Set local_user
+  ansible.builtin.set_fact:
     local_user: "{{ lookup('env', 'USER') }}"
-- set_fact:
+
+- name: Set local_tmp_bkp_config_dir
+  set_fact:
     local_tmp_bkp_config_dir: "/home/{{ local_user }}/tmp/ansible"
-- set_fact:
+
+- name: Set local_tmp_server_bkp_config_path
+  set_fact:
     local_tmp_server_bkp_config_path: "{{ local_tmp_bkp_config_dir }}/wg0.conf"
 
 - name: Make sure tmp config directory exists
@@ -11,7 +16,7 @@
   ansible.builtin.file:
     path: "{{ local_tmp_bkp_config_dir }}"
     state: directory
-    mode: '0700'
+    mode: "0700"
     owner: "{{ local_user }}"
     group: "{{ local_user }}"
   changed_when: false
@@ -23,7 +28,7 @@
   ansible.builtin.file:
     path: "{{ inventory_dir }}/wireguard_configs"
     state: directory
-    mode: '0700'
+    mode: "0700"
     owner: "{{ local_user }}"
     group: "{{ local_user }}"
   changed_when: false
@@ -41,7 +46,7 @@
     path: "{{ local_tmp_server_bkp_config_path }}"
     owner: "{{ local_user }}"
     group: "{{ local_user }}"
-    mode: '0600'
+    mode: "0600"
   run_once: true
   changed_when: false
 
