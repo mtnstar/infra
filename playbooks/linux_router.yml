@@ -6,4 +6,5 @@
     - netplan
     - linux_router
     - pihole
-    #- wireguard
+    - wireguard
+    - ufw
