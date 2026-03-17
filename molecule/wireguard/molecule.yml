@@ -7,6 +7,8 @@ platforms:
     pre_build_image: true
 verifier:
   name: testinfra
+  options:
+    sudo: true
 provisioner:
   name: ansible
   env:
