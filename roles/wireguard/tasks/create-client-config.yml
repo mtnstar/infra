@@ -1,0 +1,121 @@
+---
+- name: Set client config all path
+  ansible.builtin.set_fact:
+    client_config_all_path: "{{ local_wireguard_client_config_dir }}/{{ client.name }}/vpn-{{ wireguard_company }}-all.conf"
+
+- name: Set client config lan path
+  ansible.builtin.set_fact:
+    client_config_lan_path: "{{ local_wireguard_client_config_dir }}/{{ client.name }}/vpn-{{ wireguard_company }}-lan.conf"
+
+- name: Extract existing server keys
+  include_tasks: "process-server-keys.yml"
+
+- name: Make sure client config dir exists for given client
+  delegate_to: localhost
+  ansible.builtin.file:
+    path: "{{ local_wireguard_client_config_dir }}/{{ client.name }}"
+    state: directory
+    mode: "0700"
+    owner: "{{ local_user }}"
+    group: "{{ local_user }}"
+  changed_when: false
+
+- name: Check if client config exists
+  delegate_to: localhost
+  stat:
+    path: "{{ client_config_all_path }}.vault"
+  register: client_config_stat
+
+- name: Create client private key
+  ansible.builtin.shell: |
+    wg genkey
+  register: generated_client_private_key
+  when: not client_config_stat.stat.exists
+
+- name: Extract client config private key if present
+  delegate_to: localhost
+  become: yes
+  become_user: "{{ local_user }}"
+  shell: "ansible-vault view {{ client_config_all_path }}.vault | grep '^PrivateKey' | awk '{print $3}'"
+  register: existing_client_private_key
+  changed_when: false
+  when: client_config_stat.stat.exists
+
+- name: set client_private_key
+  ansible.builtin.set_fact:
+    client_private_key: "{{ existing_client_private_key.stdout | default(generated_client_private_key.stdout) }}"
+
+- name: Extract client config preshared key if present
+  delegate_to: localhost
+  become: yes
+  become_user: "{{ local_user }}"
+  shell: "ansible-vault view {{ client_config_all_path }}.vault | grep '^PresharedKey' | awk '{print $3}'"
+  register: existing_client_preshared_key
+  changed_when: false
+  when: client_config_stat.stat.exists
+
+- name: Create client private key
+  ansible.builtin.shell: |
+    wg genpsk
+  register: generated_client_preshared_key
+  when: not client_config_stat.stat.exists
+
+- name: set client_preshared_key
+  ansible.builtin.set_fact:
+    client_preshared_key: "{{ existing_client_preshared_key.stdout | default(generated_client_preshared_key.stdout) }}"
+
+- name: Create client config for {{ client.name }} (all)
+  delegate_to: localhost
+  ansible.builtin.template:
+    src: "client-peer-all.conf.j2"
+    dest: "{{ client_config_all_path }}"
+    mode: "0600"
+    owner: "{{ local_user }}"
+    group: "{{ local_user }}"
+
+- name: Encrypt client config for {{ client.name }} (all)
+  delegate_to: localhost
+  become: yes
+  become_user: "{{ local_user }}"
+  command: "ansible-vault encrypt {{ client_config_all_path }} --output {{ client_config_all_path }}.vault"
+
+- name: Create client config for {{ client.name }} (lan)
+  delegate_to: localhost
+  ansible.builtin.template:
+    src: "client-peer-lan.conf.j2"
+    dest: "{{ client_config_lan_path }}"
+    mode: "0600"
+    owner: "{{ local_user }}"
+    group: "{{ local_user }}"
+
+- name: Encrypt client config for {{ client.name }} (lan)
+  delegate_to: localhost
+  become: yes
+  become_user: "{{ local_user }}"
+  command: "ansible-vault encrypt {{ client_config_lan_path }} --output {{ client_config_lan_path }}.vault"
+
+- name: Shred and delete unencrypted config files
+  delegate_to: localhost
+  become: yes
+  become_user: "{{ local_user }}"
+  ansible.builtin.shell: |
+    shred -u "{{ config }}"
+  loop: "{{ [client_config_all_path, client_config_lan_path] }}"
+  loop_control:
+    loop_var: config
+
+- name: Extract client public key
+  shell: "echo '{{ client_private_key }}' | wg pubkey"
+  register: client_public_key
+  changed_when: false
+
+- name: Set client public key fact
+  ansible.builtin.set_fact:
+    client_public_key: "{{ client_public_key.stdout }}"
+
+- name: Append peer config to server config
+  ansible.builtin.blockinfile:
+    path: /etc/wireguard/{{ wireguard_interface }}.conf
+    block: "{{ lookup('template', 'client-peer-section.conf.j2') }}"
+    marker: "# {mark} {{ client.name }}"
+    insertafter: EOF

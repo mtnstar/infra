@@ -1,0 +1,39 @@
+---
+- name: Set wg config file path
+  ansible.builtin.set_fact:
+    wireguard_server_config_path: "/etc/wireguard/{{ wireguard_interface }}.conf"
+
+- name: Check if WireGuard config exists
+  stat:
+    path: "{{ wireguard_server_config_path }}"
+  register: wireguard_server_config_stat
+
+- name: Extract WireGuard private key if present
+  shell: "grep '^PrivateKey' {{ wireguard_server_config_path }} | awk '{print $3}'"
+  register: existing_wireguard_server_private_key
+  changed_when: false
+  when: wireguard_server_config_stat.stat.exists
+
+- name: Generate WireGuard private key
+  ansible.builtin.shell: |
+    wg genkey
+  register: wireguard_server_private_key_generated
+  changed_when: false
+  when: not wireguard_server_config_stat.stat.exists
+  no_log: true
+
+- name: Set server private key fact
+  ansible.builtin.set_fact:
+    wireguard_server_private_key: "{{ existing_wireguard_server_private_key.stdout | default(wireguard_server_private_key_generated.stdout) }}"
+  no_log: true
+
+- name: Extract WireGuard public key if present
+  shell: "echo '{{ wireguard_server_private_key }}' | wg pubkey"
+  register: wireguard_server_public_key
+  changed_when: false
+  when: wireguard_server_private_key is defined
+
+- name: Set public key fact
+  ansible.builtin.set_fact:
+    wireguard_server_public_key: "{{ wireguard_server_public_key.stdout }}"
+  when: wireguard_server_private_key is defined

@@ -1,10 +1,13 @@
 [Interface]
-PrivateKey = {{ private_key }}
-Address = {{ peer.ip }}
-DNS = {{ dns1 }}
+PrivateKey = {{ client_private_key }}
+Address = {{ client.ip }}
+{% if wireguard_dns | length > 0 %}
+DNS = {{ wireguard_dns | join(', ') }}
+{% endif %}
 
 [Peer]
-PublicKey = {{ wireguard_server_public_key }} 
+PublicKey = {{ wireguard_server_public_key }}
+PresharedKey = {{ client_preshared_key }}
 Endpoint = {{ wireguard_endpoint }}:{{ wireguard_port }}
-AllowedIPs = {{ allowed_ips }}
+AllowedIPs = {{ wireguard_allowed_lan_ips }}
 PersistentKeepalive = 25

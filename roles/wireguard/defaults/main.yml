@@ -1,18 +1,21 @@
 ---
+wireguard_company: "acme"
 wireguard_interface: wg0
 
 wireguard_internal_server_ip: "10.10.0.1/24"
+wireguard_subnet: "10.10.0.0/24"
+wireguard_external_interface: "eth0"
 wireguard_port: 51820
 
 # Peers configuration
 wireguard_client_peers: []
 # Example:
-# wireguard_peers:
+# wireguard_client_peers:
 #   - name: "alice"
 #     ip: "10.10.0.2/32"
 
 # DNS servers (optional)
-wireguard_dns: []
+wireguard_dns: [10.10.0.1]
 
 # MTU (optional)
 wireguard_mtu: ""

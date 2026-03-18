@@ -1,7 +1,7 @@
 ---
 wireguard_port: 51821
 wireguard_endpoint: "vpn.example.com"
-wireguard_allowed_ips: "10.10.0.1/32, 192.168.0.1/24"
+wireguard_allowed_lan_ips: "10.10.0.1/32, 192.168.0.1/24"
 wireguard_client_peers:
   - name: "alice"
     ip: "10.10.0.2/32"
