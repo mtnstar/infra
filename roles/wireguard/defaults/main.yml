@@ -23,3 +23,5 @@ wireguard_mtu: ""
 # PostUp and PostDown commands (optional)
 wireguard_post_up: []
 wireguard_post_down: []
+
+manage_ufw: true
