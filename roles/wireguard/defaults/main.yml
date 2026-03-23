@@ -15,7 +15,7 @@ wireguard_client_peers: []
 #     ip: "10.10.0.2/32"
 
 # DNS servers (optional)
-wireguard_dns: [10.10.0.1]
+wireguard_dns_servers: [10.10.0.1]
 
 # MTU (optional)
 wireguard_mtu: ""

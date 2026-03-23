@@ -8,8 +8,8 @@ PrivateKey = {{ wireguard_server_private_key }}
 MTU = {{ wireguard_mtu }}
 {% endif %}
 
-{% if wireguard_dns | length > 0 %}
-DNS = {{ wireguard_dns | join(', ') }}
+{% if wireguard_dns_servers | length > 0 %}
+DNS = {{ wireguard_dns_servers | join(', ') }}
 {% endif %}
 
 {% for command in wireguard_post_up %}

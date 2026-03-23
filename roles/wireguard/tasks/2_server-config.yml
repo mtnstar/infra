@@ -21,3 +21,4 @@
     mode: '0600'
     owner: root
     group: root
+  changed_when: false

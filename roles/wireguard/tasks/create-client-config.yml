@@ -18,7 +18,6 @@
     mode: "0700"
     owner: "{{ local_user }}"
     group: "{{ local_user }}"
-  changed_when: false
 
 - name: Check if client config exists
   delegate_to: localhost
@@ -72,12 +71,14 @@
     mode: "0600"
     owner: "{{ local_user }}"
     group: "{{ local_user }}"
+  changed_when: false
 
 - name: Encrypt client config for {{ client.name }} (all)
   delegate_to: localhost
   become: yes
   become_user: "{{ local_user }}"
   command: "ansible-vault encrypt {{ client_config_all_path }} --output {{ client_config_all_path }}.vault"
+  changed_when: false
 
 - name: Create client config for {{ client.name }} (lan)
   delegate_to: localhost
@@ -87,12 +88,14 @@
     mode: "0600"
     owner: "{{ local_user }}"
     group: "{{ local_user }}"
+  changed_when: false
 
 - name: Encrypt client config for {{ client.name }} (lan)
   delegate_to: localhost
   become: yes
   become_user: "{{ local_user }}"
   command: "ansible-vault encrypt {{ client_config_lan_path }} --output {{ client_config_lan_path }}.vault"
+  changed_when: false
 
 - name: Shred and delete unencrypted config files
   delegate_to: localhost
@@ -103,6 +106,7 @@
   loop: "{{ [client_config_all_path, client_config_lan_path] }}"
   loop_control:
     loop_var: config
+  changed_when: false
 
 - name: Extract client public key
   shell: "echo '{{ client_private_key }}' | wg pubkey"
@@ -117,5 +121,6 @@
   ansible.builtin.blockinfile:
     path: /etc/wireguard/{{ wireguard_interface }}.conf
     block: "{{ lookup('template', 'client-peer-section.conf.j2') }}"
-    marker: "# {mark} {{ client.name }}"
+    marker: "# {mark} peer {{ client.name }}"
     insertafter: EOF
+  changed_when: false

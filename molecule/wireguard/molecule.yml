@@ -19,3 +19,5 @@ provisioner:
       group_vars: "../../inventories/test/group_vars/"
       host_vars: "../../inventories/test/host_vars/"
       hosts: "../../inventories/test/hosts"
+      wireguard_configs: "../../inventories/test/wireguard_configs"
+
