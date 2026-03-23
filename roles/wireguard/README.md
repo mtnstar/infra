@@ -22,3 +22,7 @@ configs are stored and encrypted (ansible-vault) locally in `inventories/product
 to generate the QR code for the client config, run:
 
 `ansible-vault view vpn-acme-all.conf.vault | qrencode -t ansiutf8`
+
+or import the config into network manager after decrypting:
+
+`nmcli connection import type wireguard file vpn-acme-all.conf`

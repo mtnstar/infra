@@ -50,13 +50,20 @@
   run_once: true
   changed_when: false
 
-- name: Encrypt the fetched file with Ansible Vault
+- name: Encrypt server config for if it has changed
   delegate_to: localhost
   become: yes
   become_user: "{{ local_user }}"
-  command: "ansible-vault encrypt {{ local_tmp_server_bkp_config_path }} --output {{ inventory_dir }}/wireguard_configs/wg0.conf.vault"
-  ignore_errors: yes
-  run_once: true
+  shell: |
+    set -euo pipefail
+    if [ -f "{{ inventory_dir }}/wireguard_configs/wg0.conf.vault" ]; then
+      if ansible-vault view "{{ inventory_dir }}/wireguard_configs/wg0.conf.vault" | cmp -s - "{{ local_tmp_server_bkp_config_path }}"; then
+        exit 0
+      fi
+    fi
+    ansible-vault encrypt "{{ local_tmp_server_bkp_config_path }}" --output "{{ inventory_dir }}/wireguard_configs/wg0.conf.vault"
+  args:
+    executable: /bin/bash
   changed_when: false
 
 - name: Remove the unencrypted fetched file

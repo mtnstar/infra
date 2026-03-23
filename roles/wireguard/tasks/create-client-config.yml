@@ -73,11 +73,20 @@
     group: "{{ local_user }}"
   changed_when: false
 
-- name: Encrypt client config for {{ client.name }} (all)
+- name: Encrypt client config for {{ client.name }} (all) if it has changed
   delegate_to: localhost
   become: yes
   become_user: "{{ local_user }}"
-  command: "ansible-vault encrypt {{ client_config_all_path }} --output {{ client_config_all_path }}.vault"
+  shell: |
+    set -euo pipefail
+    if [ -f "{{ client_config_all_path }}.vault" ]; then
+      if ansible-vault view "{{ client_config_all_path }}.vault" | cmp -s - "{{ client_config_all_path }}"; then
+        exit 0
+      fi
+    fi
+    ansible-vault encrypt "{{ client_config_all_path }}" --output "{{ client_config_all_path }}.vault"
+  args:
+    executable: /bin/bash
   changed_when: false
 
 - name: Create client config for {{ client.name }} (lan)
@@ -90,11 +99,20 @@
     group: "{{ local_user }}"
   changed_when: false
 
-- name: Encrypt client config for {{ client.name }} (lan)
+- name: Encrypt client config for {{ client.name }} (lan) if it has changed
   delegate_to: localhost
   become: yes
   become_user: "{{ local_user }}"
-  command: "ansible-vault encrypt {{ client_config_lan_path }} --output {{ client_config_lan_path }}.vault"
+  shell: |
+    set -euo pipefail
+    if [ -f "{{ client_config_lan_path }}.vault" ]; then
+      if ansible-vault view "{{ client_config_lan_path }}.vault" | cmp -s - "{{ client_config_lan_path }}"; then
+        exit 0
+      fi
+    fi
+    ansible-vault encrypt "{{ client_config_lan_path }}" --output "{{ client_config_lan_path }}.vault"
+  args:
+    executable: /bin/bash
   changed_when: false
 
 - name: Shred and delete unencrypted config files
