@@ -23,8 +23,6 @@
 
 - name: Make sure wireguard_configs directory exists for given inventory
   delegate_to: localhost
-  become: yes
-  become_user: "{{ local_user }}"
   ansible.builtin.file:
     path: "{{ inventory_dir }}/wireguard_configs"
     state: directory
