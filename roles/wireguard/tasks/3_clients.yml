@@ -1,11 +1,10 @@
 ---
+- name: Load common wireguard facts
+  include_tasks: "facts.yml"
+
 - name: Set local_user
   ansible.builtin.set_fact:
     local_user: "{{ lookup('env', 'USER') }}"
-
-- name: Set local_wireguard_config_dir
-  ansible.builtin.set_fact:
-    local_wireguard_config_dir: "{{ inventory_dir }}/wireguard_configs"
 
 - name: Set local_wireguard_client_config_dir
   ansible.builtin.set_fact:

@@ -1,4 +1,7 @@
 ---
+- name: Load common wireguard facts
+  include_tasks: "facts.yml"
+
 - name: Set local_user
   ansible.builtin.set_fact:
     local_user: "{{ lookup('env', 'USER') }}"
@@ -24,7 +27,7 @@
 - name: Make sure wireguard_configs directory exists for given inventory
   delegate_to: localhost
   ansible.builtin.file:
-    path: "{{ inventory_dir }}/wireguard_configs"
+    path: "{{ local_wireguard_config_dir }}"
     state: directory
     mode: "0700"
     owner: "{{ local_user }}"
@@ -54,12 +57,12 @@
   become_user: "{{ local_user }}"
   shell: |
     set -euo pipefail
-    if [ -f "{{ inventory_dir }}/wireguard_configs/wg0.conf.vault" ]; then
-      if ansible-vault view "{{ inventory_dir }}/wireguard_configs/wg0.conf.vault" | cmp -s - "{{ local_tmp_server_bkp_config_path }}"; then
+    if [ -f "{{ local_wireguard_config_dir }}/wg0.conf.vaulted" ]; then
+      if ansible-vault view "{{ local_wireguard_config_dir }}/wg0.conf.vaulted" | cmp -s - "{{ local_tmp_server_bkp_config_path }}"; then
         exit 0
       fi
     fi
-    ansible-vault encrypt "{{ local_tmp_server_bkp_config_path }}" --output "{{ inventory_dir }}/wireguard_configs/wg0.conf.vault"
+    ansible-vault encrypt "{{ local_tmp_server_bkp_config_path }}" --output "{{ local_wireguard_config_dir }}/wg0.conf.vaulted"
   args:
     executable: /bin/bash
   changed_when: false

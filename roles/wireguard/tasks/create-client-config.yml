@@ -22,7 +22,7 @@
 - name: Check if client config exists
   delegate_to: localhost
   stat:
-    path: "{{ client_config_all_path }}.vault"
+    path: "{{ client_config_all_path }}.vaulted"
   register: client_config_stat
 
 - name: Create client private key
@@ -35,7 +35,7 @@
   delegate_to: localhost
   become: yes
   become_user: "{{ local_user }}"
-  shell: "ansible-vault view {{ client_config_all_path }}.vault | grep '^PrivateKey' | awk '{print $3}'"
+  shell: "ansible-vault view {{ client_config_all_path }}.vaulted | grep '^PrivateKey' | awk '{print $3}'"
   register: existing_client_private_key
   changed_when: false
   when: client_config_stat.stat.exists
@@ -48,7 +48,7 @@
   delegate_to: localhost
   become: yes
   become_user: "{{ local_user }}"
-  shell: "ansible-vault view {{ client_config_all_path }}.vault | grep '^PresharedKey' | awk '{print $3}'"
+  shell: "ansible-vault view {{ client_config_all_path }}.vaulted | grep '^PresharedKey' | awk '{print $3}'"
   register: existing_client_preshared_key
   changed_when: false
   when: client_config_stat.stat.exists
@@ -79,12 +79,12 @@
   become_user: "{{ local_user }}"
   shell: |
     set -euo pipefail
-    if [ -f "{{ client_config_all_path }}.vault" ]; then
-      if ansible-vault view "{{ client_config_all_path }}.vault" | cmp -s - "{{ client_config_all_path }}"; then
+    if [ -f "{{ client_config_all_path }}.vaulted" ]; then
+      if ansible-vault view "{{ client_config_all_path }}.vaulted" | cmp -s - "{{ client_config_all_path }}"; then
         exit 0
       fi
     fi
-    ansible-vault encrypt "{{ client_config_all_path }}" --output "{{ client_config_all_path }}.vault"
+    ansible-vault encrypt "{{ client_config_all_path }}" --output "{{ client_config_all_path }}.vaulted"
   args:
     executable: /bin/bash
   changed_when: false
@@ -105,12 +105,12 @@
   become_user: "{{ local_user }}"
   shell: |
     set -euo pipefail
-    if [ -f "{{ client_config_lan_path }}.vault" ]; then
-      if ansible-vault view "{{ client_config_lan_path }}.vault" | cmp -s - "{{ client_config_lan_path }}"; then
+    if [ -f "{{ client_config_lan_path }}.vaulted" ]; then
+      if ansible-vault view "{{ client_config_lan_path }}.vaulted" | cmp -s - "{{ client_config_lan_path }}"; then
         exit 0
       fi
     fi
-    ansible-vault encrypt "{{ client_config_lan_path }}" --output "{{ client_config_lan_path }}.vault"
+    ansible-vault encrypt "{{ client_config_lan_path }}" --output "{{ client_config_lan_path }}.vaulted"
   args:
     executable: /bin/bash
   changed_when: false

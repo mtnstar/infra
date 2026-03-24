@@ -8,3 +8,6 @@ wireguard_client_peers:
     ip: "10.10.0.2/32"
   - name: "bob"
     ip: "10.10.0.3/32"
+# default is inventory_dir/wireguard_configs
+# moved outside of inventory_dir since this breaks molecule tests
+local_wireguard_config_dir: "/tmp/molecule/wireguard_configs"

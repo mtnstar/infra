@@ -1,20 +1,20 @@
 import re
 import pytest
 
-# def test_wireguard_config_file_exists(host):
-    # config_file = host.file("/etc/wireguard/wg0.conf")
+def test_wireguard_config_file_exists(host):
+    config_file = host.file("/etc/wireguard/wg0.conf")
     
-    # assert config_file.exists
-    # assert config_file.is_file
+    assert config_file.exists
+    assert config_file.is_file
 
 
-# def test_wireguard_config_file_permissions(host):
-    # config_file = host.file("/etc/wireguard/wg0.conf")
+def test_wireguard_config_file_permissions(host):
+    config_file = host.file("/etc/wireguard/wg0.conf")
     
-    # # WireGuard config files should be readable only by root for security
-    # assert config_file.user == "root"
-    # assert config_file.group == "root"
-    # assert config_file.mode == 0o600
+    # WireGuard config files should be readable only by root for security
+    assert config_file.user == "root"
+    assert config_file.group == "root"
+    assert config_file.mode == 0o600
 
 
 def test_wireguard_server_conf_content(host):
