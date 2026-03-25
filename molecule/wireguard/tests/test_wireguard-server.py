@@ -41,3 +41,14 @@ def test_wireguard_server_conf_content(host):
     )
     
     assert re.search(alice_peer, wg0_conf_content), "alice peer section not found or invalid format"
+
+    bob_peer = (
+        r'# BEGIN peer bob\n'
+        r'\[Peer\]\n'
+        r'PublicKey = [A-Za-z0-9+/]{43}=\n'
+        r'AllowedIPs = 10\.10\.0\.3/32\n'
+        r'PreSharedKey = [A-Za-z0-9+/]{43}=\n'
+        r'# END peer bob'
+    )
+    
+    assert re.search(bob_peer, wg0_conf_content), "bob peer section not found or invalid format"
