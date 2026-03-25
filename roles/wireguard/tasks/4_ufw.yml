@@ -1,0 +1,4 @@
+---
+- name: Setup wireguard ufw config
+  include_tasks: "ufw.yml"
+  when: manage_ufw

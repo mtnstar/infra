@@ -7,79 +7,12 @@
     owner: root
     group: root
 
-- name: Set wg config file path
-  ansible.builtin.set_fact:
-    wireguard_config_path: "/etc/wireguard/{{ wireguard_interface }}.conf"
-
-- name: Check if WireGuard config exists
-  stat:
-    path: "{{ wireguard_config_path }}"
-  register: wireguard_config_stat
-
-- name: When WireGuard config exists, extract existing key
-  when: wireguard_config_stat.stat.exists
-  block:
-  - name: Extract WireGuard private key if present
-    shell: "grep '^PrivateKey' {{ wireguard_config_path }} | awk '{print $3}'"
-    register: wireguard_private_key
-    changed_when: false
-    when: wireguard_config_stat.stat.exists
-  - name: Set private key fact
-    ansible.builtin.set_fact:
-      wireguard_private_key: "{{ wireguard_private_key.stdout }}"
-    no_log: true
-  rescue:
-    - name: there was an error extracting the private key
-      debug:
-        msg: "there was an error extracting wireguard private key in existing config on {{ inventory_hostname }}."
-    - name: Fail explicitly after extracting private key error
-      fail:
-        msg: "extracting wireguard private key failed on {{ inventory_hostname }}."
-  always:
-    - name: extract wireguard private key block finished (success or failure)
-      debug:
-        msg: "extracting wireguard private key block finished on {{ inventory_hostname }}."
-
-- name: When WireGuard config does not yet exist
-  when: not wireguard_config_stat.stat.exists
-  block:
-  - name: Generate WireGuard private key
-    ansible.builtin.shell: |
-      wg genkey
-    register: wireguard_private_key_generated
-    changed_when: false
-    when: not wireguard_config_stat.stat.exists
-    no_log: true
-  - name: Set private key fact
-    ansible.builtin.set_fact:
-      wireguard_private_key: "{{ wireguard_private_key_generated.stdout }}"
-    no_log: true
-  rescue:
-    - name: there was an error generating the private key
-      debug:
-        msg: "there was an error generating wireguard private key on {{ inventory_hostname }}."
-    - name: Fail explicitly after wireguard private key generation error
-      fail:
-        msg: "wireguard private key generation failed failed on {{ inventory_hostname }}."
-  always:
-    - name: generating wireguard private key block finished (success or failure)
-      debug:
-        msg: "generating wireguard private key block finished on {{ inventory_hostname }}."
-
-- name: Generate WireGuard public key
-  ansible.builtin.shell: |
-    echo "{{ wireguard_private_key }}" | wg pubkey
-  register: wireguard_public_key
-  changed_when: false
-  no_log: true
-
-- name: Set public key fact
-  ansible.builtin.set_fact:
-    wireguard_public_key: "{{ wireguard_public_key.stdout }}"
+- name: When WireGuard config exists, extract existing keys
+  include_tasks: "process-server-keys.yml"
 
 - name: Display public key
   ansible.builtin.debug:
-    msg: "WireGuard Public Key: {{ wireguard_public_key }}"
+    msg: "WireGuard Public Key: {{ wireguard_server_public_key }}"
 
 - name: Deploy WireGuard interface configuration
   ansible.builtin.template:
@@ -88,10 +21,4 @@
     mode: '0600'
     owner: root
     group: root
-  notify: Restart WireGuard
-
-- name: Enable and start WireGuard interface
-  ansible.builtin.systemd:
-    name: "wg-quick@{{ wireguard_interface }}"
-    enabled: true
-    state: started
+  changed_when: false

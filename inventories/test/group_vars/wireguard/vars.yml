@@ -1,9 +1,13 @@
 ---
-wireguard_port: 51821
+wireguard_port: 51842
 wireguard_endpoint: "vpn.example.com"
-wireguard_allowed_ips: "10.10.0.1/32, 192.168.0.1/24"
+wireguard_allowed_lan_ips: "10.10.0.1/32, 192.168.0.1/24"
+wireguard_dns_servers: [8.8.8.8]
 wireguard_client_peers:
   - name: "alice"
     ip: "10.10.0.2/32"
   - name: "bob"
     ip: "10.10.0.3/32"
+# default is inventory_dir/wireguard_configs
+# moved outside of inventory_dir since this breaks molecule tests
+local_wireguard_config_dir: "/tmp/molecule/wireguard_configs"

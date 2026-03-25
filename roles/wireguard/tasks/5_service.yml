@@ -1,9 +1,6 @@
 ---
-- name: Restart WireGuard
+- name: Enable and start WireGuard interface
   ansible.builtin.systemd:
     name: "wg-quick@{{ wireguard_interface }}"
+    enabled: true
     state: restarted
-
-- name: reload ufw
-  community.general.ufw:
-    state: reloaded

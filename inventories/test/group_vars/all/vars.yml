@@ -10,3 +10,4 @@ bootstrap_user: "test-bootstrap"
 dns1: 8.8.8.8
 dns2: 8.8.4.4
 disable_ipv6: false
+manage_ufw: false

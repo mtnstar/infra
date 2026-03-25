@@ -1,15 +1,14 @@
 ---
+- name: Load common wireguard facts
+  include_tasks: "facts.yml"
+
 - name: Set local_user
   ansible.builtin.set_fact:
     local_user: "{{ lookup('env', 'USER') }}"
 
-- name: Set local_wireguard_config_dir
-  ansible.builtin.set_fact:
-    local_wireguard_config_dir: "{{ inventory_dir }}/wireguard_configs"
-
 - name: Set local_wireguard_client_config_dir
   ansible.builtin.set_fact:
-    local_wireguard_client_config_dir: "{{ inventory_dir }}/wireguard_configs/clients"
+    local_wireguard_client_config_dir: "{{ local_wireguard_config_dir }}/clients"
 
 - name: Make sure client config directory exists for given inventory
   delegate_to: localhost
@@ -20,3 +19,9 @@
     owner: "{{ local_user }}"
     group: "{{ local_user }}"
   changed_when: false
+
+- name: Create client config files
+  include_tasks: "create-client-config.yml"
+  loop_control:
+    loop_var: client
+  loop: "{{ wireguard_client_peers }}"

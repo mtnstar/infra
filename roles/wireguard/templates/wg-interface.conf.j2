@@ -2,14 +2,14 @@
 # {{ ansible_managed }}
 Address = {{ wireguard_internal_server_ip }}
 ListenPort = {{ wireguard_port }}
-PrivateKey = {{ wireguard_private_key }}
+PrivateKey = {{ wireguard_server_private_key }}
 
 {% if wireguard_mtu %}
 MTU = {{ wireguard_mtu }}
 {% endif %}
 
-{% if wireguard_dns | length > 0 %}
-DNS = {{ wireguard_dns | join(', ') }}
+{% if wireguard_dns_servers | length > 0 %}
+DNS = {{ wireguard_dns_servers | join(', ') }}
 {% endif %}
 
 {% for command in wireguard_post_up %}
@@ -18,21 +18,4 @@ PostUp = {{ command }}
 
 {% for command in wireguard_post_down %}
 PostDown = {{ command }}
-{% endfor %}
-
-{% for peer in wireguard_client_peers %}
-
-[Peer]
-# Peer: {{ peer.name }}
-PublicKey = {{ peer.public_key }}
-{% if peer.preshared_key is defined %}
-PresharedKey = {{ peer.preshared_key }}
-{% endif %}
-AllowedIPs = {{ peer.allowed_ips }}
-{% if peer.endpoint is defined %}
-Endpoint = {{ peer.endpoint }}
-{% endif %}
-{% if peer.persistent_keepalive is defined %}
-PersistentKeepalive = {{ peer.persistent_keepalive }}
-{% endif %}
 {% endfor %}

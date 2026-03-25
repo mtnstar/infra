@@ -1,0 +1,5 @@
+---
+- name: Set local_wireguard_config_dir
+  ansible.builtin.set_fact:
+    local_wireguard_config_dir: "{{ inventory_dir }}/wireguard_configs"
+  when: local_wireguard_config_dir is not defined
