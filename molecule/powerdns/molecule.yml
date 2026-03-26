@@ -3,7 +3,7 @@ driver:
   name: podman
 platforms:
   - name: testhost-ubuntu-24.04
-    image: ghcr.io/mtnstar/infra-test-ubuntu:24.04
+    image: ghcr.io/mtnsoft/infra-test-ubuntu:24.04
     pre_build_image: true
 verifier:
   name: testinfra
