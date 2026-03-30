@@ -65,4 +65,4 @@
       fail:
         msg: "ArgoCD installation/configuration failed on {{ inventory_hostname }}."
 
-  when: inventory_hostname == 'k3s-1'
+  when: inventory_hostname == k3s_master

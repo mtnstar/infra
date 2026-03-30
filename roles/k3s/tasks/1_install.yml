@@ -5,7 +5,7 @@
 
 - name: get k3s master ip
   set_fact:
-    k3s_master_ip: "{{ hostvars['k3s-1'].ansible_host }}"
+    k3s_master_ip: "{{ hostvars[k3s_master].ansible_host }}"
 
 - name: Install required dependencies
   package:
@@ -26,16 +26,16 @@
     creates:  /usr/local/bin/k3s
   environment:
     INSTALL_K3S_EXEC: "server --cluster-init --flannel-backend=host-gw"
-  when: inventory_hostname == 'k3s-1'
+  when: inventory_hostname == k3s_master
 
 - name: Wait for k3s to be ready on master
   wait_for: 
     path: "{{ k3s_token_file }}"
     timeout:  60
-  when: inventory_hostname == 'k3s-1'
+  when: inventory_hostname == k3s_master
 
 - name: Read k3s token from master
-  delegate_to: k3s-1
+  delegate_to: "{{ k3s_master }}"
   slurp:
     src: "{{ k3s_token_file }}"
   register:  k3s_token
@@ -53,7 +53,7 @@
     K3S_TOKEN: "{{ k3s_cluster_token }}"
     INSTALL_K3S_EXEC: "agent"
   when: 
-    - inventory_hostname != 'k3s-1'
+    - inventory_hostname != k3s_master
 
 - name:  Ensure k3s service is enabled and started
   systemd:
@@ -61,7 +61,7 @@
     enabled: yes
     state: started
   when: 
-    - inventory_hostname == 'k3s-1'
+    - inventory_hostname == k3s_master
 
 - name:  Ensure k3s-agent service is enabled and started
   systemd:
@@ -69,7 +69,7 @@
     enabled: yes
     state: started
   when: 
-    - inventory_hostname != 'k3s-1'
+    - inventory_hostname != k3s_master
 
 - name: Get k3s version
   command: "k3s --version"
@@ -81,7 +81,7 @@
     msg: "{{ k3s_version.stdout }}"
 
 - name:  Get cluster nodes
-  delegate_to: k3s-1
+  delegate_to: "{{ k3s_master }}"
   command: kubectl get nodes
   environment:
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
