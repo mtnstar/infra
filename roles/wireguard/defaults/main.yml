@@ -1,10 +1,5 @@
 ---
 wireguard_company: "acme"
-wireguard_interface: wg0
-
-wireguard_internal_server_ip: "10.10.0.1/24"
-wireguard_subnet: "10.10.0.0/24"
-wireguard_external_interface: "eth0"
 wireguard_port: 51820
 
 # Peers configuration
@@ -23,5 +18,3 @@ wireguard_mtu: ""
 # PostUp and PostDown commands (optional)
 wireguard_post_up: []
 wireguard_post_down: []
-
-manage_ufw: true

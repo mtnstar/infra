@@ -5,7 +5,6 @@
     regexp: "^DEFAULT_FORWARD_POLICY="
     line: 'DEFAULT_FORWARD_POLICY="ACCEPT"'
     backup: yes
-  notify: reload ufw
 
 - name: Check if NAT rules already exist in before.rules
   command: grep -q "NAT table rules for WireGuard" /etc/ufw/before.rules
@@ -26,4 +25,3 @@
       COMMIT
     backup: yes
   when: nat_rules_exist.rc != 0
-  notify: reload ufw
