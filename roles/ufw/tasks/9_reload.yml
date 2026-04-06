@@ -1,0 +1,4 @@
+---
+- name: Reload UFW
+  command: ufw reload
+  ignore_errors: yes

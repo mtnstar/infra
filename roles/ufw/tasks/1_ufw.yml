@@ -16,10 +16,6 @@
         state: present
       when: disable_ipv6
 
-    - name: Reload UFW after IPv6 config change
-      command: ufw reload
-      ignore_errors: yes
-
     - name: Reset UFW to defaults (if requested)
       community.general.ufw:
         state: reset
